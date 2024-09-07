@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="Gradient" id=1]
+offsets = PackedFloat32Array( 0, 0.748344, 1 )
+colors = PackedColorArray( 0, 0, 0, 1, 0.0596026, 0.0596026, 0.0596026, 1, 1, 1, 1, 1 )
+
+[node name="BlowParticles" type="CPUParticles2D" groups=["hit particles"]]
+emitting = false
+amount = 60
+lifetime = 2.0
+one_shot = true
+explosiveness = 1.0
+emission_shape = 1
+emission_sphere_radius = 10.0
+spread = 180.0
+initial_velocity = 110.0
+initial_velocity_random = 1.0
+angular_velocity = 250.0
+angular_velocity_random = 1.0
+linear_accel = 5.0
+linear_accel_random = 1.0
+radial_accel = 10.0
+radial_accel_random = 1.0
+damping = 10.0
+damping_random = 1.0
+angle = 90.0
+angle_random = 1.0
+scale_amount = 15.0
+scale_amount_random = 1.0
+color_ramp = SubResource( 1 )
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 1.5
+one_shot = true
+autostart = true

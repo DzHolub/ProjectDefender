@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://wfcbya6r70fh"]
+
+[ext_resource type="PackedScene" uid="uid://lctqputi1hik" path="res://assets/turrets/TurretBPAmmo.tscn" id="1"]
+
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(89.1966, 15.4918)
+
+[sub_resource type="Gradient" id="2"]
+
+[node name="Ammo" instance=ExtResource("1")]
+scale = Vector2(0.3, 0.3)
+
+[node name="AmmoBody" parent="." index="0"]
+region_enabled = true
+region_rect = Rect2(55.4543, 46.9215, 84.8754, 10.2879)
+
+[node name="CollisionShape2D" parent="." index="1"]
+position = Vector2(-0.783418, -0.169991)
+shape = SubResource("1")
+
+[node name="CPUParticles2D" parent="." index="2"]
+position = Vector2(-36.8402, 0.394022)
+emitting = true
+emission_shape = 0
+gravity = Vector2(-100, 3)
+color_ramp = SubResource("2")

@@ -1,0 +1,49 @@
+[gd_scene load_steps=5 format=3 uid="uid://c8uwejdlowr2i"]
+
+[ext_resource type="PackedScene" uid="uid://brhxtwv7qttx4" path="res://assets/turrets/TurretBP.tscn" id="1_rcpmb"]
+[ext_resource type="Texture2D" uid="uid://cnp47sgv175is" path="res://assets/SpriteSheet.png" id="2"]
+
+[sub_resource type="Curve" id="1"]
+max_value = 3.0
+_data = [Vector2(0, 1.44545), 0.0, 0.0, 0, 0, Vector2(0.971264, 1.32567), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="2"]
+colors = PackedColorArray(0.210938, 0.210938, 0.210938, 1, 0.836643, 0.836643, 0.836643, 1)
+
+[node name="Laser" instance=ExtResource("1_rcpmb")]
+position = Vector2(6, 5)
+type = 1
+ammo_amount = 50
+
+[node name="TurretBody" parent="." index="0"]
+position = Vector2(-16.3843, -9.58205)
+texture = ExtResource("2")
+region_enabled = true
+region_rect = Rect2(148.127, 36.5785, 79.4429, 19.2335)
+
+[node name="EndPoint" parent="." index="1"]
+position = Vector2(60.655, 0)
+
+[node name="RayCast3D" parent="." index="2"]
+position = Vector2(60.226, 0)
+
+[node name="AmmoLabel" parent="." index="3"]
+offset_left = -84.1076
+offset_top = -51.1802
+offset_right = -2.10751
+offset_bottom = -9.18019
+
+[node name="MuzzleShotParticle" parent="." index="6"]
+position = Vector2(59.1822, -1.29634)
+amount = 50
+lifetime = 2.0
+explosiveness = 1.0
+randomness = 1.0
+lifetime_randomness = 1.0
+emission_shape = 1
+emission_sphere_radius = 3.0
+spread = 3.0
+gravity = Vector2(50, 0)
+scale_amount_curve = SubResource("1")
+color_ramp = SubResource("2")

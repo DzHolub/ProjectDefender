@@ -1,0 +1,78 @@
+[gd_scene load_steps=9 format=3 uid="uid://dmnh5ny8ftqrs"]
+
+[ext_resource type="Script" path="res://assets/enemies/EnemyBP.gd" id="1_hqhpu"]
+[ext_resource type="Texture2D" uid="uid://cnp47sgv175is" path="res://assets/SpriteSheet.png" id="2_8fnfh"]
+[ext_resource type="FontFile" uid="uid://dm0ulu5fclaqu" path="res://assets/FontUniSans.otf" id="3_4wskg"]
+
+[sub_resource type="CapsuleShape2D" id="1"]
+height = 20.0
+
+[sub_resource type="CapsuleShape2D" id="2"]
+height = 20.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_tx1gu"]
+radius = 0.5
+height = 1.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_60kjq"]
+radius = 1094.75
+
+[sub_resource type="Theme" id="Theme_2u6fs"]
+default_base_scale = 1.0
+default_font = ExtResource("3_4wskg")
+
+[node name="EnemyBasic" type="Node2D"]
+position = Vector2(1.58919, 0)
+scale = Vector2(0.3, 0.3)
+script = ExtResource("1_hqhpu")
+
+[node name="EnemyBody" type="Area2D" parent="." groups=["enemy"]]
+collision_layer = 3
+
+[node name="EnemySprite" type="Sprite2D" parent="EnemyBody" groups=["enemy"]]
+modulate = Color(0, 0, 0, 1)
+self_modulate = Color(0, 0, 0, 1)
+position = Vector2(0, 3.33333)
+scale = Vector2(2, 2)
+texture = ExtResource("2_8fnfh")
+region_enabled = true
+region_rect = Rect2(8.52399, 48.9683, 37.6413, 48.0371)
+
+[node name="EnemyCollisionZoneA" type="CollisionShape2D" parent="EnemyBody"]
+shape = SubResource("1")
+
+[node name="EnemyCollisionZoneB" type="CollisionShape2D" parent="EnemyBody"]
+shape = SubResource("2")
+
+[node name="EnemyCollisionZoneC" type="CollisionShape2D" parent="EnemyBody"]
+shape = SubResource("2")
+
+[node name="EnemyCollisionZoneD" type="CollisionShape2D" parent="EnemyBody"]
+modulate = Color(0.254902, 0, 1, 1)
+shape = SubResource("CapsuleShape2D_tx1gu")
+
+[node name="EndPoint" type="Marker2D" parent="EnemyBody"]
+
+[node name="ExplosionArea" type="Area2D" parent="EnemyBody"]
+
+[node name="CollisionShapeExplosion" type="CollisionShape2D" parent="EnemyBody/ExplosionArea"]
+scale = Vector2(1e-05, 1e-05)
+shape = SubResource("CircleShape2D_60kjq")
+
+[node name="EnemyDeathTimer" type="Timer" parent="."]
+wait_time = 30.0
+one_shot = true
+autostart = true
+
+[node name="EnemyLabel" type="Label" parent="."]
+offset_left = 78.0
+offset_top = -57.0
+offset_right = 411.0
+offset_bottom = 87.0
+scale = Vector2(2, 2)
+theme = SubResource("Theme_2u6fs")
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "TXT"
+
+[connection signal="area_entered" from="EnemyBody" to="." method="_on_enemy_body_area_entered"]
+[connection signal="timeout" from="EnemyDeathTimer" to="." method="_on_DeathTimer_timeout"]

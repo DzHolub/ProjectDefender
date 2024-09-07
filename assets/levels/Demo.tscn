@@ -1,0 +1,128 @@
+[gd_scene load_steps=10 format=3 uid="uid://ci8mtnqi6tc64"]
+
+[ext_resource type="PackedScene" uid="uid://dvfh5664d7pq7" path="res://assets/turrets/Machinegun.tscn" id="1_heqgl"]
+[ext_resource type="PackedScene" uid="uid://c8uwejdlowr2i" path="res://assets/turrets/Laser.tscn" id="2_7t54j"]
+[ext_resource type="PackedScene" uid="uid://c07qnlhhabr76" path="res://assets/turrets/Artillery.tscn" id="3_5dtt8"]
+[ext_resource type="Texture2D" uid="uid://cnp47sgv175is" path="res://assets/SpriteSheet.png" id="4_rgl4y"]
+[ext_resource type="PackedScene" uid="uid://cgvw7vnqfrydu" path="res://assets/enemies/Spawner.tscn" id="5_qd5vo"]
+[ext_resource type="PackedScene" uid="uid://c7xyojhyg14ap" path="res://assets/enemies/Asteroid.tscn" id="6_qookw"]
+[ext_resource type="PackedScene" uid="uid://ftlxb0vlfgep" path="res://assets/enemies/Scout.tscn" id="7_y8h0u"]
+[ext_resource type="PackedScene" uid="uid://bbj5d1s26iqhi" path="res://ui/UIIngame.tscn" id="8_y3d0u"]
+
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(1085, 311.919)
+
+[node name="LevelMockup" type="Node"]
+
+[node name="Player" type="Node2D" parent="."]
+
+[node name="WeaponPosition" type="Marker2D" parent="Player"]
+
+[node name="MachineGun" parent="Player/WeaponPosition" instance=ExtResource("1_heqgl")]
+position = Vector2(62, 1864)
+ammo_amount = 150
+
+[node name="Laser" parent="Player/WeaponPosition" instance=ExtResource("2_7t54j")]
+position = Vector2(958, 1871)
+ammo_amount = 10
+
+[node name="Artillery" parent="Player/WeaponPosition" instance=ExtResource("3_5dtt8")]
+position = Vector2(513, 1869)
+ammo_amount = 3
+
+[node name="TurretBaseLeft" type="Sprite2D" parent="Player"]
+z_index = -5
+position = Vector2(65, 1908.5)
+texture = ExtResource("4_rgl4y")
+offset = Vector2(0, -15)
+region_enabled = true
+region_rect = Rect2(73, 2, 68, 31)
+
+[node name="TurretBaseMiddle" type="Sprite2D" parent="Player"]
+z_index = -5
+position = Vector2(516, 1914.5)
+texture = ExtResource("4_rgl4y")
+offset = Vector2(0, -15)
+region_enabled = true
+region_rect = Rect2(73, 2, 68, 31)
+
+[node name="TurretBaseRight" type="Sprite2D" parent="Player"]
+z_index = -5
+position = Vector2(964, 1913.5)
+texture = ExtResource("4_rgl4y")
+offset = Vector2(0, -15)
+region_enabled = true
+region_rect = Rect2(73, 2, 68, 31)
+
+[node name="Enemy" type="Node2D" parent="."]
+
+[node name="EnemySpawner2" parent="Enemy" instance=ExtResource("5_qd5vo")]
+position = Vector2(-175, 32)
+delay_time = 2.0
+random = true
+enemy_type = {
+"abductor": 0,
+"asteroid": 0,
+"blinker": 0,
+"drone": 0,
+"dropship": 0,
+"jammer": 0,
+"laser": 0,
+"meteor": 1,
+"mothership": 0,
+"phantom": 0,
+"scout": 12,
+"scrambler": 0,
+"shield": 0,
+"training": 0,
+"vessel": 0
+}
+
+[node name="EnemySpawner3" parent="Enemy" instance=ExtResource("5_qd5vo")]
+position = Vector2(338.141, 58.509)
+queue_position = 1
+enemy_type = {
+"abductor": 0,
+"asteroid": 15,
+"blinker": 0,
+"drone": 0,
+"dropship": 0,
+"jammer": 0,
+"laser": 0,
+"meteor": 0,
+"mothership": 0,
+"phantom": 0,
+"scout": 0,
+"scrambler": 0,
+"shield": 0,
+"training": 0,
+"vessel": 0
+}
+
+[node name="EnemySpawner4" parent="Enemy" instance=ExtResource("5_qd5vo")]
+position = Vector2(-8.47559, 58.509)
+queue_position = 2
+delay_time = 5.0
+random = true
+
+[node name="EnemyAsteroid" parent="Enemy" groups=["enemy"] instance=ExtResource("6_qookw")]
+position = Vector2(150, 250)
+scale = Vector2(1, 1)
+
+[node name="EnemyAsteroid2" parent="Enemy" groups=["enemy"] instance=ExtResource("6_qookw")]
+position = Vector2(57, 49)
+
+[node name="EnemyScout" parent="Enemy" instance=ExtResource("7_y8h0u")]
+position = Vector2(200, 200)
+
+[node name="EnemyAsteroid3" parent="Enemy" instance=ExtResource("6_qookw")]
+position = Vector2(200, 500)
+
+[node name="GroundZone" type="Area2D" parent="." groups=["ground"]]
+
+[node name="GroundCollisionZone" type="CollisionShape2D" parent="GroundZone" groups=["ground"]]
+visibility_layer = 7
+position = Vector2(544, 1764)
+shape = SubResource("1")
+
+[node name="UIIngame" parent="." instance=ExtResource("8_y3d0u")]

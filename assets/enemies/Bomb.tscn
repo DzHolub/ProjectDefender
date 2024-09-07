@@ -1,0 +1,78 @@
+[gd_scene load_steps=9 format=3 uid="uid://bghwfsobhtgt4"]
+
+[ext_resource type="PackedScene" uid="uid://dmnh5ny8ftqrs" path="res://assets/enemies/EnemyBP.tscn" id="1_7bber"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_mr17b"]
+radius = 18.8303
+height = 37.6607
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qtxnh"]
+height = 20.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_weqbm"]
+height = 20.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_f6gc7"]
+radius = 0.5
+height = 1.0
+
+[sub_resource type="Gradient" id="Gradient_ljgrr"]
+
+[sub_resource type="FontVariation" id="FontVariation_km3im"]
+
+[sub_resource type="Theme" id="Theme_f3nfm"]
+default_base_scale = 1.0
+default_font = SubResource("FontVariation_km3im")
+default_font_size = 50
+
+[node name="EnemyAsteroid" instance=ExtResource("1_7bber")]
+type = 2
+
+[node name="EnemyBody" parent="." index="0"]
+metadata/_edit_group_ = true
+
+[node name="EnemySprite" parent="EnemyBody" index="0"]
+region_rect = Rect2(118.546, 57.5938, 21.2421, 19.5041)
+
+[node name="EnemyCollisionZoneA" parent="EnemyBody" index="1"]
+position = Vector2(1.36937, 3.33333)
+rotation = -0.837758
+shape = SubResource("CapsuleShape2D_mr17b")
+
+[node name="EnemyCollisionZoneB" parent="EnemyBody" index="2"]
+visible = false
+shape = SubResource("CapsuleShape2D_qtxnh")
+
+[node name="EnemyCollisionZoneC" parent="EnemyBody" index="3"]
+visible = false
+shape = SubResource("CapsuleShape2D_weqbm")
+
+[node name="EnemyCollisionZoneD" parent="EnemyBody" index="4"]
+visible = false
+shape = SubResource("CapsuleShape2D_f6gc7")
+
+[node name="EndPoint" parent="EnemyBody" index="5"]
+visible = false
+
+[node name="TrailParticles" type="CPUParticles2D" parent="EnemyBody" index="7"]
+position = Vector2(-10.4056, -5.96046e-07)
+amount = 18
+emission_shape = 1
+emission_sphere_radius = 5.0
+direction = Vector2(0, 0)
+spread = 43.6
+gravity = Vector2(-100, 3)
+color_ramp = SubResource("Gradient_ljgrr")
+
+[node name="EnemyDeathTimer" parent="." index="1"]
+wait_time = 7.0
+
+[node name="EnemyLabel" parent="." index="2"]
+visible = false
+custom_minimum_size = Vector2(200, 80)
+offset_left = 71.0
+offset_top = -53.0
+offset_right = 348.0
+offset_bottom = 44.0
+theme = SubResource("Theme_f3nfm")
+justification_flags = 0

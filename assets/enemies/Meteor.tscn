@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://coxw2260rxacd"]
+
+[ext_resource type="PackedScene" uid="uid://dmnh5ny8ftqrs" path="res://assets/enemies/EnemyBP.tscn" id="1"]
+
+[node name="EnemyMeteor" instance=ExtResource("1")]
+scale = Vector2(1, 1)
+type = 3

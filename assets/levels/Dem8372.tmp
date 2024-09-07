@@ -1,0 +1,212 @@
+[gd_scene load_steps=15 format=3 uid="uid://ci8mtnqi6tc64"]
+
+[ext_resource type="PackedScene" uid="uid://dvfh5664d7pq7" path="res://assets/turrets/Machinegun.tscn" id="1_heqgl"]
+[ext_resource type="PackedScene" uid="uid://c8uwejdlowr2i" path="res://assets/turrets/Laser.tscn" id="2_7t54j"]
+[ext_resource type="PackedScene" uid="uid://c07qnlhhabr76" path="res://assets/turrets/Artillery.tscn" id="3_5dtt8"]
+[ext_resource type="Texture2D" uid="uid://cnp47sgv175is" path="res://assets/SpriteSheet.png" id="4_rgl4y"]
+[ext_resource type="PackedScene" path="res://assets/enemies/Spawner.tscn" id="5_qd5vo"]
+[ext_resource type="PackedScene" uid="uid://c7xyojhyg14ap" path="res://assets/enemies/Asteroid.tscn" id="6_qookw"]
+[ext_resource type="Script" path="res://ui/UI.gd" id="7_ov0ug"]
+[ext_resource type="PackedScene" uid="uid://ftlxb0vlfgep" path="res://assets/enemies/Scout.tscn" id="7_y8h0u"]
+[ext_resource type="Shader" path="res://ui/ColorReverse.gdshader" id="8_503mp"]
+[ext_resource type="FontFile" uid="uid://dm0ulu5fclaqu" path="res://assets/FontUniSans.otf" id="9_a77a1"]
+
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(1085, 83.8353)
+
+[sub_resource type="ShaderMaterial" id="2"]
+shader = ExtResource("8_503mp")
+
+[sub_resource type="AnimatedTexture" id="3"]
+
+[sub_resource type="FontFile" id="4"]
+fallbacks = Array[Font]([ExtResource("9_a77a1")])
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[node name="LevelMockup" type="Node"]
+
+[node name="Player" type="Node2D" parent="."]
+
+[node name="WeaponPosition" type="Marker2D" parent="Player"]
+
+[node name="MachineGun" parent="Player/WeaponPosition" instance=ExtResource("1_heqgl")]
+position = Vector2(70, 1250)
+type = "machinegun"
+ammo_amount = 150
+
+[node name="Laser" parent="Player/WeaponPosition" instance=ExtResource("2_7t54j")]
+position = Vector2(650, 1250)
+type = "laser"
+ammo_amount = 10
+
+[node name="Artillery" parent="Player/WeaponPosition" instance=ExtResource("3_5dtt8")]
+position = Vector2(360, 1250)
+type = "artillery"
+ammo_amount = 3
+
+[node name="TurretBaseLeft" type="Sprite2D" parent="Player"]
+z_index = -5
+position = Vector2(70, 1280)
+texture = ExtResource("4_rgl4y")
+offset = Vector2(0, -15)
+region_enabled = true
+region_rect = Rect2(73, 2, 68, 31)
+
+[node name="TurretBaseMiddle" type="Sprite2D" parent="Player"]
+z_index = -5
+position = Vector2(360, 1280)
+texture = ExtResource("4_rgl4y")
+offset = Vector2(0, -15)
+region_enabled = true
+region_rect = Rect2(73, 2, 68, 31)
+
+[node name="TurretBaseRight" type="Sprite2D" parent="Player"]
+z_index = -5
+position = Vector2(650, 1280)
+texture = ExtResource("4_rgl4y")
+offset = Vector2(0, -15)
+region_enabled = true
+region_rect = Rect2(73, 2, 68, 31)
+
+[node name="Enemy" type="Node2D" parent="."]
+
+[node name="EnemySpawner2" parent="Enemy" instance=ExtResource("5_qd5vo")]
+position = Vector2(-175, 32)
+delay_time = 2.0
+random = true
+enemy_type = {
+"abductor": 0,
+"asteroid": 0,
+"blinker": 0,
+"drone": 0,
+"dropship": 0,
+"jammer": 0,
+"laser": 0,
+"meteor": 1,
+"mothership": 0,
+"phantom": 0,
+"scout": 12,
+"scrambler": 0,
+"shield": 0,
+"training": 0,
+"vessel": 0
+}
+
+[node name="EnemySpawner3" parent="Enemy" instance=ExtResource("5_qd5vo")]
+position = Vector2(338.141, 58.509)
+queue_position = 1
+enemy_type = {
+"abductor": 0,
+"asteroid": 15,
+"blinker": 0,
+"drone": 0,
+"dropship": 0,
+"jammer": 0,
+"laser": 0,
+"meteor": 0,
+"mothership": 0,
+"phantom": 0,
+"scout": 0,
+"scrambler": 0,
+"shield": 0,
+"training": 0,
+"vessel": 0
+}
+
+[node name="EnemySpawner4" parent="Enemy" instance=ExtResource("5_qd5vo")]
+position = Vector2(-8.47559, 58.509)
+queue_position = 2
+delay_time = 5.0
+random = true
+
+[node name="EnemyAsteroid" parent="Enemy" groups=["enemy"] instance=ExtResource("6_qookw")]
+position = Vector2(150, 250)
+scale = Vector2(1, 1)
+type = "asteroid"
+
+[node name="EnemyAsteroid2" parent="Enemy" groups=["enemy"] instance=ExtResource("6_qookw")]
+position = Vector2(57, 49)
+type = "asteroid"
+
+[node name="EnemyScout" parent="Enemy" instance=ExtResource("7_y8h0u")]
+position = Vector2(200, 200)
+
+[node name="EnemyAsteroid3" parent="Enemy" instance=ExtResource("6_qookw")]
+position = Vector2(200, 500)
+type = "asteroid"
+
+[node name="GroundZone" type="Area2D" parent="." groups=["ground"]]
+position = Vector2(520, 937)
+
+[node name="GroundCollisionZone" type="CollisionShape2D" parent="GroundZone"]
+position = Vector2(-152.5, 298.675)
+shape = SubResource("1")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -1.49829
+offset_bottom = -1.49829
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("7_ov0ug")
+
+[node name="InverseScreen" type="TextureRect" parent="UI"]
+visible = false
+material = SubResource("2")
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 1.49829
+offset_bottom = 1.49829
+size_flags_horizontal = 2
+size_flags_vertical = 2
+texture = SubResource("3")
+expand_mode = 1
+
+[node name="DebugLabel" type="Label" parent="UI"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 1.49829
+offset_bottom = 47.4983
+grow_horizontal = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("4")
+text = "TEST LABEL"
+
+[node name="Button" type="Button" parent="UI"]
+modulate = Color(0.25098, 0.164706, 0.164706, 1)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -360.0
+offset_top = 32.4983
+offset_right = 84.0
+offset_bottom = 159.498
+grow_horizontal = 2
+scale = Vector2(0.2, 0.2)
+
+[node name="Label" type="Label" parent="UI/Button"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 70
+text = "RESET"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="UI/Button" to="UI" method="_on_Button_pressed"]

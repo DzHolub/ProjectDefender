@@ -1,0 +1,115 @@
+[gd_scene load_steps=8 format=3 uid="uid://bbj5d1s26iqhi"]
+
+[ext_resource type="Script" path="res://ui/UI.gd" id="1_wwof8"]
+[ext_resource type="Shader" path="res://ui/ColorReverse.gdshader" id="2_ydveb"]
+[ext_resource type="FontFile" uid="uid://dm0ulu5fclaqu" path="res://assets/FontUniSans.otf" id="3_uquqa"]
+
+[sub_resource type="ShaderMaterial" id="2"]
+shader = ExtResource("2_ydveb")
+
+[sub_resource type="AnimatedTexture" id="3"]
+
+[sub_resource type="FontFile" id="4"]
+fallbacks = Array[Font]([ExtResource("3_uquqa")])
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_j4wd6"]
+load_path = "res://.godot/imported/SpriteSheet.png-224745ff387571f09c27eaa394503970.ctex"
+
+[node name="UIIngame" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -1.49829
+offset_bottom = -1.49829
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_wwof8")
+
+[node name="InverseScreen" type="TextureRect" parent="."]
+visible = false
+material = SubResource("2")
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 1.49829
+offset_bottom = 1.49829
+size_flags_horizontal = 2
+size_flags_vertical = 2
+texture = SubResource("3")
+expand_mode = 1
+
+[node name="DebugLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 116.498
+offset_bottom = 162.498
+grow_horizontal = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("4")
+text = "TEST LABEL"
+horizontal_alignment = 2
+
+[node name="Button" type="Button" parent="."]
+modulate = Color(0.25098, 0.164706, 0.164706, 1)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 417.0
+offset_top = 46.4983
+offset_right = 861.0
+offset_bottom = 173.498
+grow_horizontal = 2
+scale = Vector2(0.2, 0.2)
+
+[node name="Label" type="Label" parent="Button"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 70
+text = "RESET"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LowLivesTimer" type="Timer" parent="."]
+wait_time = 0.5
+autostart = true
+
+[node name="CitizensInfo" type="Node2D" parent="."]
+
+[node name="CitizensIcon" type="Sprite2D" parent="CitizensInfo"]
+position = Vector2(56, 65)
+scale = Vector2(3, 3)
+texture = SubResource("CompressedTexture2D_j4wd6")
+region_enabled = true
+region_rect = Rect2(67.5386, 88.3237, 23.783, 29.4585)
+
+[node name="CitizensCount" type="Label" parent="CitizensInfo"]
+offset_left = 96.0
+offset_top = 35.0
+offset_right = 305.0
+offset_bottom = 104.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("3_uquqa")
+theme_override_font_sizes/font_size = 60
+text = "5K"
+vertical_alignment = 1
+
+[connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]

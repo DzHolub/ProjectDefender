@@ -1,0 +1,58 @@
+[gd_scene load_steps=8 format=3 uid="uid://c7xyojhyg14ap"]
+
+[ext_resource type="PackedScene" uid="uid://dmnh5ny8ftqrs" path="res://assets/enemies/EnemyBP.tscn" id="1_gisaf"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_mr17b"]
+radius = 35.4302
+height = 99.5994
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qtxnh"]
+height = 20.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_weqbm"]
+height = 20.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_f6gc7"]
+radius = 0.5
+height = 1.0
+
+[sub_resource type="FontVariation" id="FontVariation_km3im"]
+
+[sub_resource type="Theme" id="Theme_f3nfm"]
+default_base_scale = 1.0
+default_font = SubResource("FontVariation_km3im")
+default_font_size = 50
+
+[node name="EnemyAsteroid" instance=ExtResource("1_gisaf")]
+type = 1
+
+[node name="EnemySprite" parent="EnemyBody" index="0"]
+region_rect = Rect2(5.18023, 105.734, 51.7993, 41.7272)
+
+[node name="EnemyCollisionZoneA" parent="EnemyBody" index="1"]
+position = Vector2(1.36937, 3.33333)
+rotation = -0.837758
+shape = SubResource("CapsuleShape2D_mr17b")
+
+[node name="EnemyCollisionZoneB" parent="EnemyBody" index="2"]
+visible = false
+shape = SubResource("CapsuleShape2D_qtxnh")
+
+[node name="EnemyCollisionZoneC" parent="EnemyBody" index="3"]
+visible = false
+shape = SubResource("CapsuleShape2D_weqbm")
+
+[node name="EnemyCollisionZoneD" parent="EnemyBody" index="4"]
+shape = SubResource("CapsuleShape2D_f6gc7")
+
+[node name="EnemyDeathTimer" parent="." index="1"]
+wait_time = 50.0
+
+[node name="EnemyLabel" parent="." index="2"]
+custom_minimum_size = Vector2(200, 80)
+offset_left = 71.0
+offset_top = -53.0
+offset_right = 348.0
+offset_bottom = 44.0
+theme = SubResource("Theme_f3nfm")
+justification_flags = 0

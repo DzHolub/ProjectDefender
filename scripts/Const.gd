@@ -1,0 +1,71 @@
+extends Node
+
+const PATH_DATA = "user://data.save" #path to game saves
+const PATH_ASSETS = "res://assets/"
+const PATH_TURRETS = "res://assets/turrets/"
+const PATH_ENEMIES = "res://assets/enemies/"
+const PATH_SPRITESHEET = "res://assets/SpriteSheet.png"
+
+enum TURRET_TYPE {
+	MACHINEGUN,
+	LASER,
+	ARTILLERY
+}
+
+const TURRET_HEALTH_MAX = 100
+const TURRET_SHIELD_MAX = 100
+const TURRET_GROUP = 'turret'
+
+enum AMMO_TYPE {
+	BULLET,
+	LASER,
+	EXPLOSIVE
+}
+
+enum AMMO {
+	MACHINEGUN_BASIC,
+	LASER_BASIC,
+	ARTILLERY_BASIC
+}
+
+enum ENEMY_TYPE {
+	SCOUT,
+	ASTEROID,
+	BOMB,
+	METEOR,
+	VESSEL,
+	DRONE,
+	DROPSHIP,
+	PHANTOM,
+	SCRAMBLER,
+	ABDUCTOR,
+	JAMMER,
+	BLINKER,
+	SHIELD,
+	MOTHERSHIP,
+	TRAINING
+}
+
+const ENEMY_SHIELD_SIZE = 50
+
+const COLOR_TRANSP = Color(0, 0, 0, 0)
+const COLOR_LASER_CHARGED = Color(0, 0, 0, 0.8)
+const COLOR_SIGHT = Color(0.862745, 0.0784314, 0.235294, 0.4)
+const COLOR_ACTIVATION_ZONE_OFF = Color(0, 0, 0, 0.3)
+const COLOR_ACTIVATION_ZONE_ON = Color(0, 0, 0, 0.1)
+const COLOR_RELOAD_INDICATOR = Color(0, 0, 0, 0.7)
+const COLOR_ENEMY_SHIELD_INNER = Color(0, 0, 0, 0.1)
+const COLOR_ENEMY_SHIELD_OUTER = Color(0.862745, 0.0784314, 0.235294, 0.3)
+const COLOR_UI_FRAME = Color.BLACK
+const COLOR_UI_HEALTH_SEGMENT = Color.BLACK
+
+const SPRITESHEET_RECT_HEALTH = Rect2(65, 62, 28, 23)
+
+const UI_FONT = "FontUniSans.otf"
+const UI_GAP_HEALTH_SEGMENT = 11
+const UI_TURRET_ACTIVATION_ZONE = 100
+const UI_ACTIVE_AMMO_INDICATOR_POS = Vector2(60,-60)
+const UI_SCREEN_MARGIN_POS = 300
+const UI_SCREEN_MARGIN_PERCENT = 25
+
+const GROUND_GROUP = 'ground' 

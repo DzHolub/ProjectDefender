@@ -1,0 +1,90 @@
+[gd_scene load_steps=7 format=3 uid="uid://bbj5d1s26iqhi"]
+
+[ext_resource type="Script" path="res://ui/UI.gd" id="1_wwof8"]
+[ext_resource type="Shader" path="res://ui/ColorReverse.gdshader" id="2_ydveb"]
+[ext_resource type="FontFile" uid="uid://dm0ulu5fclaqu" path="res://assets/FontUniSans.otf" id="3_uquqa"]
+
+[sub_resource type="ShaderMaterial" id="2"]
+shader = ExtResource("2_ydveb")
+
+[sub_resource type="AnimatedTexture" id="3"]
+
+[sub_resource type="FontFile" id="4"]
+fallbacks = Array[Font]([ExtResource("3_uquqa")])
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[node name="UIIngame" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -1.49829
+offset_bottom = -1.49829
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_wwof8")
+
+[node name="InverseScreen" type="TextureRect" parent="."]
+visible = false
+material = SubResource("2")
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 1.49829
+offset_bottom = 1.49829
+size_flags_horizontal = 2
+size_flags_vertical = 2
+texture = SubResource("3")
+expand_mode = 1
+
+[node name="DebugLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 116.498
+offset_bottom = 162.498
+grow_horizontal = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("4")
+text = "TEST LABEL"
+
+[node name="Button" type="Button" parent="."]
+modulate = Color(0.25098, 0.164706, 0.164706, 1)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -360.0
+offset_top = 32.4983
+offset_right = 84.0
+offset_bottom = 159.498
+grow_horizontal = 2
+scale = Vector2(0.2, 0.2)
+
+[node name="Label" type="Label" parent="Button"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 70
+text = "RESET"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LowLivesTimer" type="Timer" parent="."]
+wait_time = 0.5
+
+[connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]

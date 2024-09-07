@@ -1,0 +1,41 @@
+[gd_scene load_steps=5 format=3 uid="uid://dvfh5664d7pq7"]
+
+[ext_resource type="PackedScene" uid="uid://brhxtwv7qttx4" path="res://assets/turrets/TurretBP.tscn" id="1"]
+[ext_resource type="Texture2D" uid="uid://cnp47sgv175is" path="res://assets/SpriteSheet.png" id="2"]
+
+[sub_resource type="Curve" id="1"]
+max_value = 3.0
+_data = [Vector2(0, 1.44545), 0.0, 0.0, 0, 0, Vector2(0.971264, 1.32567), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="2"]
+colors = PackedColorArray(0.210938, 0.210938, 0.210938, 1, 0.836643, 0.836643, 0.836643, 1)
+
+[node name="MachineGun" instance=ExtResource("1")]
+type = 0
+ammo_amount = 50
+
+[node name="TurretBody" parent="." index="0"]
+position = Vector2(-20.1824, -14.7503)
+texture = ExtResource("2")
+region_enabled = true
+region_rect = Rect2(147.02, 1.579, 79.063, 25.596)
+
+[node name="EndPoint" parent="." index="1"]
+position = Vector2(48.7114, 0.325756)
+
+[node name="RayCast3D" parent="." index="2"]
+position = Vector2(10.0282, 0.120476)
+
+[node name="MuzzleShotParticle" parent="." index="6"]
+position = Vector2(54.4629, -2.47618)
+amount = 40
+lifetime = 0.2
+randomness = 1.0
+lifetime_randomness = 1.0
+emission_shape = 1
+emission_sphere_radius = 3.0
+spread = 30.0
+gravity = Vector2(50, 0)
+scale_amount_curve = SubResource("1")
+color_ramp = SubResource("2")

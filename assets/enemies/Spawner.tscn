@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://cgvw7vnqfrydu"]
+
+[ext_resource type="Script" path="res://assets/enemies/Spawner.gd" id="1"]
+[ext_resource type="Script" path="res://assets/levels/Demo_spawner.gd" id="2_ev8mx"]
+
+[node name="EnemySpawner" type="Node2D" groups=["Spawner"]]
+script = ExtResource("1")
+spawn_queue = ExtResource("2_ev8mx")
+
+[node name="SpawnTimer" type="Timer" parent="."]
+
+[node name="DelayTimer" type="Timer" parent="."]
+one_shot = true
+
+[connection signal="timeout" from="SpawnTimer" to="." method="_on_SpawnTimer_timeout"]
+[connection signal="timeout" from="DelayTimer" to="." method="_on_DelayTimer_timeout"]

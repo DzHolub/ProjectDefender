@@ -1,0 +1,61 @@
+[gd_scene load_steps=5 format=3 uid="uid://brhxtwv7qttx4"]
+
+[ext_resource type="Script" path="res://assets/turrets/TurretBP.gd" id="1_dbc0r"]
+[ext_resource type="FontFile" uid="uid://dm0ulu5fclaqu" path="res://assets/FontUniSans.otf" id="2_814v5"]
+
+[sub_resource type="FontFile" id="1"]
+fallbacks = Array[Font]([ExtResource("2_814v5")])
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[sub_resource type="CircleShape2D" id="2"]
+radius = 75.6354
+
+[node name="TurretMain" type="Area2D" groups=["turret"]]
+script = ExtResource("1_dbc0r")
+type = null
+ammo_amount = null
+
+[node name="TurretBody" type="Sprite2D" parent="."]
+centered = false
+
+[node name="EndPoint" type="Marker2D" parent="."]
+
+[node name="RayCast3D" type="RayCast2D" parent="."]
+modulate = Color(0.388235, 0.784314, 0.0862745, 1)
+self_modulate = Color(0.498039, 0.905882, 0.054902, 1)
+target_position = Vector2(2000, 0)
+collision_mask = 2
+collide_with_areas = true
+
+[node name="AmmoLabel" type="Label" parent="."]
+offset_left = 26.1626
+offset_top = -45.1899
+offset_right = 108.163
+offset_bottom = -3.18986
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("1")
+text = "TXT"
+clip_text = true
+
+[node name="ChargeTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="ReloadTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="MuzzleShotParticle" type="CPUParticles2D" parent="."]
+emitting = false
+one_shot = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("2")
+
+[connection signal="timeout" from="ChargeTimer" to="." method="_on_ChargeTimer_timeout"]
+[connection signal="timeout" from="ReloadTimer" to="." method="_on_ReloadTimer_timeout"]

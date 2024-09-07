@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=3 uid="uid://ftlxb0vlfgep"]
+
+[ext_resource type="PackedScene" uid="uid://dmnh5ny8ftqrs" path="res://assets/enemies/EnemyBP.tscn" id="1_hpno7"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ibmcm"]
+height = 86.6667
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_pe457"]
+radius = 18.036
+height = 69.4054
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_63d3w"]
+radius = 18.036
+height = 42.7387
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_wxcnp"]
+radius = 0.5
+height = 1.0
+
+[node name="EnemyScout" instance=ExtResource("1_hpno7")]
+
+[node name="EnemyCollisionZoneA" parent="EnemyBody" index="1"]
+position = Vector2(1.36937, 3.33333)
+shape = SubResource("CapsuleShape2D_ibmcm")
+
+[node name="EnemyCollisionZoneB" parent="EnemyBody" index="2"]
+position = Vector2(1.36937, -20)
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_pe457")
+
+[node name="EnemyCollisionZoneC" parent="EnemyBody" index="3"]
+position = Vector2(1.36937, 6.66667)
+shape = SubResource("CapsuleShape2D_63d3w")
+
+[node name="EnemyCollisionZoneD" parent="EnemyBody" index="4"]
+shape = SubResource("CapsuleShape2D_wxcnp")
+
+[node name="EndPoint" parent="EnemyBody" index="5"]
+position = Vector2(0, 45)
+
+[node name="EnemyLabel" parent="." index="2"]
+offset_left = 41.3694
+offset_top = -46.6667
+offset_right = 237.369
+offset_bottom = 54.3333
