@@ -100,8 +100,12 @@ func _on_game_over(final_score: int, reason: String):
 	# Handle game over UI here
 
 
-func _on_Button_pressed() -> void: # FOR DEBUG - DELETE IT LATER
-	GlobalVars.nulify_progress()
+## Debug button handler - only works in debug builds
+func _on_Button_pressed() -> void:
+	if OS.is_debug_build():
+		GlobalVars.nulify_progress()
+	else:
+		push_warning("Debug button pressed in release build")
 
 
 func on_citizens_changed() -> void:

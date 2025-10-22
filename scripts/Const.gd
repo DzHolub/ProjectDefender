@@ -16,6 +16,11 @@ const TURRET_HEALTH_MAX = 100
 const TURRET_SHIELD_MAX = 100
 const TURRET_GROUP = 'turret'
 
+# Health and Shield Constants
+const MIN_HEALTH: int = 0
+const MIN_SHIELD: int = 0
+const DEAD_STATE: int = 0
+
 enum AMMO_TYPE {
 	BULLET,
 	LASER,

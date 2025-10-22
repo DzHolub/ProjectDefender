@@ -126,19 +126,19 @@ func get_damage(damage: int) -> void:
 	# Emit enemy hit signal
 	EventBus.enemy_hit.emit(self, damage)
 	
-	if shield > 0:
+	if shield > Const.MIN_SHIELD:
 		shield -= damage
-		if shield <= 0:
+		if shield <= Const.MIN_SHIELD:
 			health += shield
-			shield = 0
+			shield = Const.MIN_SHIELD
 			if shield_collizion_zone and shield_collizion_zone.get_shape():
-				shield_collizion_zone.get_shape().radius = 0
+				shield_collizion_zone.get_shape().radius = Const.MIN_SHIELD
 			# Emit shield broken signal
 			EventBus.enemy_shield_broken.emit(self)
-	elif shield <= 0:
+	elif shield <= Const.MIN_SHIELD:
 		health -= damage
 		
-	if health <= 0:
+	if health <= Const.MIN_HEALTH:
 		# Emit enemy destruction signal
 		EventBus.enemy_destroyed.emit(self, type)
 		

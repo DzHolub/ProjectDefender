@@ -82,7 +82,7 @@ func _process(_delta: float) -> void:
 	var debug_text: String = str("Score: ", score, " || Time=", Engine.time_scale, additional_debug_info)
 	EventBus.emit_debug_info(debug_text)
 	
-	if health <= 0:
+	if health <= Const.MIN_HEALTH:
 		EventBus.game_over.emit(score, "Health depleted")
 
 ## Input Validation Functions
@@ -472,7 +472,13 @@ func reset_to_defaults() -> void:
 	print("Game state reset to defaults")
 
 
-func nulify_progress() -> void: # For debug - delete it later
+## Debug Functions
+## Reset game progress for testing (debug builds only)
+func nulify_progress() -> void:
+	if not OS.is_debug_build():
+		push_warning("nulify_progress() called in release build - ignored")
+		return
+	
 	score = 0
 	health = 4
 	citizens = 45000
@@ -480,6 +486,7 @@ func nulify_progress() -> void: # For debug - delete it later
 	EventBus.emit_health_changed(health)
 	EventBus.emit_citizens_changed(citizens)
 	save_progress()
+	print("Game progress reset (debug mode)")
 
 
 # HELPER FUNCTIONS START

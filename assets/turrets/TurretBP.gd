@@ -209,62 +209,119 @@ func _draw() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	# Calculate if finger is within radius, check touches and drags for the exact turret. Activates it
 	var touch_distance = self.get_position().distance_to(event.get_position())
+	
 	if event is InputEventScreenTouch:
-		var touch_index = event.get_index()
-		
-		# Validate touch index before accessing touch_points array
-		if not GlobalVars.validate_touch_index(touch_index):
-			push_warning("Invalid touch index in turret input: " + str(touch_index))
-			return
-		
-		# Handle touch press
-		if event.is_pressed() and touch_distance <= Const.UI_TURRET_ACTIVATION_ZONE:
-			finger_id = touch_index
-			GlobalVars.touch_points[finger_id].assigned_id = self
-			is_activated = true
-		
-		# Handle touch release
-		if not event.is_pressed() and touch_index == finger_id:
-			if is_chargeable and is_charged and touch_distance > Const.UI_TURRET_ACTIVATION_ZONE:
-				is_shooting = true
-				turret_fire()
-			turret_disable()
-			GlobalVars.touch_points[finger_id].assigned_id = 0
-			finger_id = -1
-			Engine.time_scale = 1
-		if is_activated && touch_distance > Const.UI_TURRET_ACTIVATION_ZONE:
-			if !is_chargeable:
-				is_shooting = true
-			else: 
-				charging_beam()
+		_handle_touch_input(event, touch_distance)
+	elif event is InputEventScreenDrag:
+		_handle_drag_input(event, touch_distance)
+	elif event is InputEventMouseButton and OS.get_name() != "Android":
+		_handle_mouse_input(event, touch_distance)
+	elif event is InputEventMouseMotion and OS.get_name() != "Android":
+		_handle_mouse_motion(event, touch_distance)
 
-	if (event is InputEventScreenDrag && event.get_index()==finger_id):
-		if is_activated && touch_distance > Const.UI_TURRET_ACTIVATION_ZONE:
-			if !is_chargeable:
-				is_shooting = true
-			else: 
-				charging_beam()
-		elif is_activated && touch_distance < Const.UI_TURRET_ACTIVATION_ZONE:
-			is_shooting = false
 
-	if (event is InputEventMouseButton && OS.get_name() != "Android"): #temporary functionality for mouse tests
-		if touch_distance <= Const.UI_TURRET_ACTIVATION_ZONE:
-			is_activated = true
-		if !event.is_pressed():
-			if type == Const.TURRET_TYPE.LASER && is_charged && touch_distance > Const.UI_TURRET_ACTIVATION_ZONE:
-				is_shooting = true
-				turret_fire()
-			turret_disable()
-			Engine.time_scale = 1
-	if (event is InputEventMouseMotion && OS.get_name() != "Android"):
-		if is_activated && touch_distance > Const.UI_TURRET_ACTIVATION_ZONE:
-			if type != Const.TURRET_TYPE.LASER:
-				is_shooting = true
-			else:
-				if (is_chargeable):
-					charging_beam()
+# Handle touch screen input
+func _handle_touch_input(event: InputEventScreenTouch, touch_distance: float) -> void:
+	var touch_index = event.get_index()
+	
+	# Validate touch index before accessing touch_points array
+	if not GlobalVars.validate_touch_index(touch_index):
+		push_warning("Invalid touch index in turret input: " + str(touch_index))
+		return
+	
+	# Handle touch press
+	if event.is_pressed() and _is_within_activation_zone(touch_distance):
+		_activate_turret(touch_index)
+		return
+	
+	# Handle touch release
+	if not event.is_pressed() and touch_index == finger_id:
+		_handle_touch_release(touch_distance)
+		return
+	
+	# Handle shooting while dragging outside activation zone
+	if is_activated and not _is_within_activation_zone(touch_distance):
+		_handle_shooting_state()
+
+
+# Handle drag input
+func _handle_drag_input(event: InputEventScreenDrag, touch_distance: float) -> void:
+	if event.get_index() != finger_id:
+		return
+	
+	if is_activated and not _is_within_activation_zone(touch_distance):
+		_handle_shooting_state()
+	elif is_activated and _is_within_activation_zone(touch_distance):
+		is_shooting = false
+
+
+# Handle mouse input (for desktop testing)
+func _handle_mouse_input(event: InputEventMouseButton, touch_distance: float) -> void:
+	if _is_within_activation_zone(touch_distance):
+		is_activated = true
+	
+	if not event.is_pressed():
+		_handle_mouse_release(touch_distance)
+
+
+# Activate turret with touch
+func _activate_turret(touch_index: int) -> void:
+	finger_id = touch_index
+	GlobalVars.touch_points[finger_id].assigned_id = self
+	is_activated = true
+
+
+# Handle touch release
+func _handle_touch_release(touch_distance: float) -> void:
+	if is_chargeable and is_charged and not _is_within_activation_zone(touch_distance):
+		is_shooting = true
+		turret_fire()
+	
+	_deactivate_turret()
+
+
+# Handle mouse release
+func _handle_mouse_release(touch_distance: float) -> void:
+	if type == Const.TURRET_TYPE.LASER and is_charged and not _is_within_activation_zone(touch_distance):
+		is_shooting = true
+		turret_fire()
+	
+	turret_disable()
+	Engine.time_scale = 1
+
+
+# Handle shooting state based on turret type
+func _handle_shooting_state() -> void:
+	if not is_chargeable:
+		is_shooting = true
+	else:
+		charging_beam()
+
+
+# Deactivate turret
+func _deactivate_turret() -> void:
+	turret_disable()
+	if finger_id >= 0 and GlobalVars.validate_touch_index(finger_id):
+		GlobalVars.touch_points[finger_id].assigned_id = 0
+	finger_id = -1
+	Engine.time_scale = 1
+
+
+# Check if touch is within activation zone
+func _is_within_activation_zone(distance: float) -> bool:
+	return distance <= Const.UI_TURRET_ACTIVATION_ZONE
+
+
+# Handle mouse motion (for desktop testing)
+func _handle_mouse_motion(_event: InputEventMouseMotion, touch_distance: float) -> void:
+	if not is_activated or _is_within_activation_zone(touch_distance):
+		return
+	
+	if type != Const.TURRET_TYPE.LASER:
+		is_shooting = true
+	elif is_chargeable:
+		charging_beam()
 
 
 func charging_beam() -> void: # Laser gun mechanics

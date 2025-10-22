@@ -19,6 +19,7 @@ boot_splash/show_image=false
 
 EventBus="*res://scripts/EventBus.gd"
 Const="*res://scripts/Const.gd"
+DebugManager="*res://scripts/DebugManager.gd"
 ResourceManager="*res://scripts/ResourceManager.gd"
 VisibilityManager="*res://scripts/VisibilityManager.gd"
 ParticleOptimizer="*res://scripts/ParticleOptimizer.gd"

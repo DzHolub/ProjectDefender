@@ -67,6 +67,10 @@ signal wave_started(wave_number: int)
 @warning_ignore("unused_signal")
 signal wave_completed(wave_number: int)
 
+# Debug Signals
+@warning_ignore("unused_signal")
+signal debug_overlay_toggled(enabled: bool)
+
 # Save/Load Signals
 @warning_ignore("unused_signal")
 signal save_requested()
