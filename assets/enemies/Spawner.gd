@@ -10,18 +10,43 @@ extends Node
 var spawn_index = 0
 var left_scr_margin
 var right_scr_margin
-var get_all_enemies = {
-		Const.ENEMY_TYPE.METEOR: preload(Const.PATH_ENEMIES + "Meteor.tscn"), 
-		Const.ENEMY_TYPE.ASTEROID: preload(Const.PATH_ENEMIES + "Asteroid.tscn"), 
-		Const.ENEMY_TYPE.SCOUT: preload(Const.PATH_ENEMIES + "Scout.tscn")
-}
+var get_all_enemies: Dictionary = {}
 
 func _ready():
 	left_scr_margin = Helper.get_screen_border_margin(10, Vector2.LEFT)
 	right_scr_margin = Helper.get_screen_border_margin(10, Vector2.RIGHT)
 	Helper.get_screen_border_margin(15, Vector2.LEFT)
+	
+	# Load enemy scenes with validation
+	load_enemy_scenes()
+	
 	check_queue()
 	init_spawner_index_data()
+
+
+func load_enemy_scenes() -> void:
+	# Load enemy scenes with validation
+	var meteor_scene = ResourceValidator.load_scene(Const.PATH_ENEMIES + "Meteor.tscn")
+	var asteroid_scene = ResourceValidator.load_scene(Const.PATH_ENEMIES + "Asteroid.tscn")
+	var scout_scene = ResourceValidator.load_scene(Const.PATH_ENEMIES + "Scout.tscn")
+	
+	# Only add successfully loaded scenes to the dictionary
+	if meteor_scene != null:
+		get_all_enemies[Const.ENEMY_TYPE.METEOR] = meteor_scene
+	else:
+		push_error("Failed to load Meteor scene")
+	
+	if asteroid_scene != null:
+		get_all_enemies[Const.ENEMY_TYPE.ASTEROID] = asteroid_scene
+	else:
+		push_error("Failed to load Asteroid scene")
+	
+	if scout_scene != null:
+		get_all_enemies[Const.ENEMY_TYPE.SCOUT] = scout_scene
+	else:
+		push_error("Failed to load Scout scene")
+	
+	print("Loaded " + str(get_all_enemies.size()) + " enemy types in spawner")
 
 
 func check_queue():
@@ -45,10 +70,30 @@ func _on_SpawnTimer_timeout():
 			randomizer.append(i)
 	if !randomizer.is_empty(): #if these are still some ships - spawn them
 		var rand_enemy = randomizer[randi()%randomizer.size()]
-		var e = get_all_enemies[rand_enemy].instantiate() #spawn randomized enemy
+		
+		# Validate enemy scene exists before instantiating
+		if not get_all_enemies.has(rand_enemy):
+			push_error("Enemy type not found in spawner: " + str(rand_enemy))
+			enemy_type[rand_enemy] = 0  # Skip this enemy type
+			return
+		
+		var enemy_scene = get_all_enemies[rand_enemy]
+		if enemy_scene == null:
+			push_error("Enemy scene is null: " + str(rand_enemy))
+			enemy_type[rand_enemy] = 0  # Skip this enemy type
+			return
+		
+		# Safe instantiation with validation
+		var e = ResourceValidator.instantiate_scene(enemy_scene, "Enemy_" + str(rand_enemy))
+		if e == null:
+			push_error("Failed to instantiate enemy: " + str(rand_enemy))
+			enemy_type[rand_enemy] = 0  # Skip this enemy type
+			return
+		
 		if random: #if random is on - then mix spawn time and place
 			spawn_timer.set_wait_time(randf_range(0.4, 3))
 			e.global_position.x = randf_range(left_scr_margin, right_scr_margin)
+		
 		add_child(e)
 		
 		# Emit enemy spawned signal

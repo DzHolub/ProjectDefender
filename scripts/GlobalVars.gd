@@ -1,8 +1,15 @@
 extends Node2D
 class_name Helper
 
-var textures = preload(Const.PATH_SPRITESHEET)
+var textures: Texture2D
 var additional_debug_info = ''
+
+func _init():
+	# Load spritesheet with validation
+	textures = ResourceValidator.load_texture(Const.PATH_SPRITESHEET)
+	if textures == null:
+		push_error("Failed to load spritesheet texture")
+		textures = ResourceValidator.get_fallback_texture(Vector2i(512, 512))
 
 var selected_level = 0 #pass here info regarding level to load
 var score: int = 0
