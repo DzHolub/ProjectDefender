@@ -44,12 +44,36 @@ func _ready() -> void:
 	# Configure raycast for enemy detection
 	raycast_line.collision_mask = Const.COLLISION_LAYER_ENEMY
 	
+	# Configure render layer for optimization
+	z_index = Const.RENDER_LAYER_TURRETS
+	
 	GlobalTurretData.init_turret(self)
 	reload_timer.set_wait_time(fire_rate)
 	ammo_label.text = str(ammo_amount)
 	turret_start_position = get_global_transform()
 	turret_ui_start_position = ammo_label.global_position
 	queue_redraw()
+
+
+func _exit_tree() -> void:
+	# Stop and disconnect timers
+	if reload_timer and is_instance_valid(reload_timer):
+		reload_timer.stop()
+		if reload_timer.timeout.is_connected(_on_ReloadTimer_timeout):
+			reload_timer.timeout.disconnect(_on_ReloadTimer_timeout)
+	
+	if charge_timer and is_instance_valid(charge_timer):
+		charge_timer.stop()
+		if charge_timer.timeout.is_connected(_on_ChargeTimer_timeout):
+			charge_timer.timeout.disconnect(_on_ChargeTimer_timeout)
+	
+	# Stop particle emissions
+	if muzzle_particle and is_instance_valid(muzzle_particle):
+		muzzle_particle.emitting = false
+	
+	# Clear raycast
+	if raycast_line and is_instance_valid(raycast_line):
+		raycast_line.enabled = false
 
 
 # Validate all required node references exist

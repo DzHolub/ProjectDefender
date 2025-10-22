@@ -19,6 +19,10 @@ boot_splash/show_image=false
 
 EventBus="*res://scripts/EventBus.gd"
 Const="*res://scripts/Const.gd"
+ResourceManager="*res://scripts/ResourceManager.gd"
+VisibilityManager="*res://scripts/VisibilityManager.gd"
+ParticleOptimizer="*res://scripts/ParticleOptimizer.gd"
+MemoryMonitor="*res://scripts/MemoryMonitor.gd"
 GlobalVars="*res://scripts/GlobalVars.gd"
 GlobalTurretData="*res://scripts/GlobalTurretData.gd"
 GlobalEnemyData="*res://scripts/GlobalEnemyData.gd"

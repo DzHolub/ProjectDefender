@@ -70,6 +70,15 @@ const UI_SCREEN_MARGIN_PERCENT = 25
 
 const GROUND_GROUP = 'ground'
 
+# Render Layers (for visibility and culling optimization)
+const RENDER_LAYER_GROUND: int = 1
+const RENDER_LAYER_BACKGROUND: int = 1
+const RENDER_LAYER_ENEMIES: int = 2
+const RENDER_LAYER_TURRETS: int = 3
+const RENDER_LAYER_PROJECTILES: int = 4
+const RENDER_LAYER_EFFECTS: int = 5
+const RENDER_LAYER_UI: int = 6
+
 # Collision Layers (Physics Layers 2D)
 # Layer 1 (bit 0): Ground/Environment
 # Layer 2 (bit 1): Enemies

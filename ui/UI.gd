@@ -29,6 +29,30 @@ func _ready() -> void:
 	EventBus.game_over.connect(_on_game_over)
 
 
+func _exit_tree() -> void:
+	# Disconnect all EventBus signals
+	if EventBus.score_changed.is_connected(_on_score_changed):
+		EventBus.score_changed.disconnect(_on_score_changed)
+	
+	if EventBus.citizens_changed.is_connected(_on_citizens_changed):
+		EventBus.citizens_changed.disconnect(_on_citizens_changed)
+	
+	if EventBus.debug_info_changed.is_connected(_on_debug_info_changed):
+		EventBus.debug_info_changed.disconnect(_on_debug_info_changed)
+	
+	if EventBus.game_over.is_connected(_on_game_over):
+		EventBus.game_over.disconnect(_on_game_over)
+	
+	# Stop timer
+	if low_lives_timer and is_instance_valid(low_lives_timer):
+		low_lives_timer.stop()
+	
+	# Clean up tween
+	if tween_node and is_instance_valid(tween_node):
+		tween_node.kill()
+		tween_node = null
+
+
 # Validate all required node references exist
 func validate_node_references() -> bool:
 	var all_valid = true

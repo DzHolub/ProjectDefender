@@ -33,6 +33,9 @@ func _ready() -> void:
 	explosion_area.collision_layer = Const.COLLISION_LAYER_EXPLOSION
 	explosion_area.collision_mask = Const.COLLISION_MASK_EXPLOSION
 	
+	# Configure render layer for optimization
+	z_index = Const.RENDER_LAYER_PROJECTILES
+	
 	velocity = Vector2(speed,0).rotated(rot)
 	start_position = get_global_position()
 	destruction_timer.start(destruction_time)
@@ -41,6 +44,23 @@ func _ready() -> void:
 			bomb_flicker_timer = Timer.new()
 			add_child(bomb_flicker_timer)
 			bomb_flicker_timer.start(0.4)
+
+
+func _exit_tree() -> void:
+	# Stop and disconnect destruction timer
+	if destruction_timer and is_instance_valid(destruction_timer):
+		destruction_timer.stop()
+		if destruction_timer.timeout.is_connected(_on_DestructionTimer_timeout):
+			destruction_timer.timeout.disconnect(_on_DestructionTimer_timeout)
+	
+	# Clean up dynamically created bomb flicker timer
+	if bomb_flicker_timer and is_instance_valid(bomb_flicker_timer):
+		bomb_flicker_timer.stop()
+		bomb_flicker_timer.queue_free()
+		bomb_flicker_timer = null
+	
+	# Clear hit particles reference
+	hit_particles = null
 
 
 # Validate all required node references exist
@@ -62,17 +82,25 @@ func _process(delta: float) -> void:
 	velocity.y += ammo_gravity * delta
 	position += velocity * delta
 	rotation = velocity.angle()
-	queue_redraw()
+	
+	# Only redraw if visible and has custom draw content
+	if visible and (type == Const.AMMO_TYPE.LASER or type == Const.AMMO_TYPE.EXPLOSIVE):
+		queue_redraw()
 
 
 func _draw() -> void:
+	# Early exit if not visible
+	if not visible:
+		return
+	
 	match type:
 		Const.AMMO_TYPE.LASER: 
 			draw_line(to_local(start_position), to_local(position), Color(0, 0, 0, 
 				lerp(0.0, 1.0, destruction_timer.time_left/destruction_timer.wait_time)), 10, true)
 		Const.AMMO_TYPE.EXPLOSIVE: 
-			draw_circle(to_local(position), 40, Color(0, 0, 0, 
-				lerp(0.0, 0.5, bomb_flicker_timer.time_left/bomb_flicker_timer.wait_time))) #draw activation zone around the turrent
+			if bomb_flicker_timer and is_instance_valid(bomb_flicker_timer):
+				draw_circle(to_local(position), 40, Color(0, 0, 0, 
+					lerp(0.0, 0.5, bomb_flicker_timer.time_left/bomb_flicker_timer.wait_time)))
 
 
 func _on_DestructionTimer_timeout() -> void:

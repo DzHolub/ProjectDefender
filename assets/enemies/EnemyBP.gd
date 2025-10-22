@@ -43,6 +43,9 @@ func _ready() -> void:
 	explosion_area.collision_layer = Const.COLLISION_LAYER_EXPLOSION
 	explosion_area.collision_mask = Const.COLLISION_MASK_EXPLOSION
 	
+	# Configure render layer for optimization
+	z_index = Const.RENDER_LAYER_ENEMIES
+	
 	body.gravity = 0.01
 	GlobalEnemyData.init_enemy(self)
 	velocity = Vector2(direction_speed, speed)
@@ -55,6 +58,29 @@ func _ready() -> void:
 	start_position = get_global_position()
 	destruction_timer.start(destruction_time)
 	_setup_bomb_timer()
+
+
+func _exit_tree() -> void:
+	# Clean up timers
+	if destruction_timer and is_instance_valid(destruction_timer):
+		destruction_timer.stop()
+		if destruction_timer.timeout.is_connected(_on_DeathTimer_timeout):
+			destruction_timer.timeout.disconnect(_on_DeathTimer_timeout)
+	
+	if bomb_flicker_timer and is_instance_valid(bomb_flicker_timer):
+		bomb_flicker_timer.stop()
+		bomb_flicker_timer.queue_free()
+		bomb_flicker_timer = null
+	
+	# Clean up death particles if still referenced
+	if death_particles and is_instance_valid(death_particles):
+		if death_particles.get_parent() == null:
+			death_particles.queue_free()
+		death_particles = null
+	
+	# Clear collision shape references
+	if shield_collizion_zone and shield_collizion_zone.shape:
+		shield_collizion_zone.shape = null
 
 
 # Validate all required node references exist
@@ -143,7 +169,9 @@ func get_damage(damage: int) -> void:
 			radius_str = str(shield_collizion_zone.get_shape().radius)
 		text_label.text = str(health) + "/" + str(shield) + "/" + radius_str
 	
-	queue_redraw()
+	# Only redraw if visible (culling optimization)
+	if visible:
+		queue_redraw()
 
 
 func _process(delta: float) -> void:
@@ -153,7 +181,10 @@ func _process(delta: float) -> void:
 		body.rotation += rot_speed * delta
 	# Ammo logic
 	# body.rotation = velocity.angle()
-	queue_redraw()
+	
+	# Only redraw if visible (culling optimization)
+	if visible:
+		queue_redraw()
 
 
 func _on_DeathTimer_timeout() -> void:

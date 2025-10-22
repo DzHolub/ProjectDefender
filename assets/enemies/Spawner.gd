@@ -34,6 +34,22 @@ func _ready() -> void:
 	init_spawner_index_data()
 
 
+func _exit_tree() -> void:
+	# Stop and disconnect timers
+	if spawn_timer and is_instance_valid(spawn_timer):
+		spawn_timer.stop()
+		if spawn_timer.timeout.is_connected(_on_SpawnTimer_timeout):
+			spawn_timer.timeout.disconnect(_on_SpawnTimer_timeout)
+	
+	if delay_timer and is_instance_valid(delay_timer):
+		delay_timer.stop()
+		if delay_timer.timeout.is_connected(_on_DelayTimer_timeout):
+			delay_timer.timeout.disconnect(_on_DelayTimer_timeout)
+	
+	# Clear loaded enemy scenes dictionary
+	get_all_enemies.clear()
+
+
 # Validate all required node references exist
 func validate_node_references() -> bool:
 	var all_valid = true
