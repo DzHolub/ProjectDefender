@@ -3,33 +3,39 @@ extends Node2D
 const NodeValidator = preload("res://scripts/NodeValidator.gd")
 
 @export var type: Const.ENEMY_TYPE
-var start_position
-var speed = 10
-var rot_speed = 0
-var direction_speed = 0
-var size_multiplier = 1
-var velocity = 0
-var health = 10
-var shield = 0
-var shield_radius = 0
-var destruction_time = 50
-var turret_damage = 0
-var city_damage = 0
-var detonation_area_multiplier = 0
-var bomb_flicker_timer = 100
 
-var hit_particles = preload(Const.PATH_TURRETS + "MachinegunPrtlHit.tscn")
-var death_particles
+var start_position: Vector2
+var speed: float = 10.0
+var rot_speed: float = 0.0
+var direction_speed: float = 0.0
+var size_multiplier: float = 1.0
+var velocity: Vector2 = Vector2.ZERO
+var health: int = 10
+var shield: int = 0
+var shield_radius: float = 0.0
+var destruction_time: float = 50.0
+var turret_damage: int = 0
+var city_damage: int = 0
+var detonation_area_multiplier: float = 0.0
+var bomb_flicker_timer: Timer = null
 
-@onready var sprite = $EnemyBody/EnemySprite
-@onready var body = $EnemyBody
-@onready var shield_collizion_zone = $EnemyBody/EnemyCollisionZoneD
-@onready var destruction_timer = $EnemyDeathTimer
-@onready var explosion_area = $EnemyBody/ExplosionArea
-@onready var text_label = $EnemyLabel #health and shield info
+var hit_particles: PackedScene = preload(Const.PATH_TURRETS + "MachinegunPrtlHit.tscn")
+var death_particles: Node = null
+
+@onready var sprite: Sprite2D = $EnemyBody/EnemySprite
+@onready var body: Area2D = $EnemyBody
+@onready var shield_collizion_zone: CollisionShape2D = $EnemyBody/EnemyCollisionZoneD
+@onready var destruction_timer: Timer = $EnemyDeathTimer
+@onready var explosion_area: Area2D = $EnemyBody/ExplosionArea
+@onready var text_label: Label = $EnemyLabel # Health and shield info
 
 
-func _ready():
+func _ready() -> void:
+	# Validate critical node references
+	if not validate_node_references():
+		push_error("Enemy missing critical node references")
+		return
+	
 	body.gravity = 0.01
 	GlobalEnemyData.init_enemy(self)
 	velocity = Vector2(direction_speed, speed)
@@ -41,6 +47,41 @@ func _ready():
 	#ammo logic
 	start_position = get_global_position()
 	destruction_timer.start(destruction_time)
+	_setup_bomb_timer()
+
+
+# Validate all required node references exist
+func validate_node_references() -> bool:
+	var all_valid = true
+	
+	if not sprite:
+		push_error("Enemy missing sprite reference")
+		all_valid = false
+	
+	if not body:
+		push_error("Enemy missing body reference")
+		all_valid = false
+	
+	if not shield_collizion_zone:
+		push_error("Enemy missing shield_collizion_zone reference")
+		all_valid = false
+	
+	if not destruction_timer:
+		push_error("Enemy missing destruction_timer reference")
+		all_valid = false
+	
+	if not explosion_area:
+		push_error("Enemy missing explosion_area reference")
+		all_valid = false
+	
+	if not text_label:
+		push_error("Enemy missing text_label reference")
+		all_valid = false
+	
+	return all_valid
+
+
+func _setup_bomb_timer() -> void:
 	match type:
 		Const.ENEMY_TYPE.BOMB:
 			bomb_flicker_timer = Timer.new()
@@ -48,7 +89,7 @@ func _ready():
 			bomb_flicker_timer.start(0.4)
 
 
-func get_damage(damage: int):
+func get_damage(damage: int) -> void:
 	# Emit enemy hit signal
 	EventBus.enemy_hit.emit(self, damage)
 	
@@ -95,28 +136,31 @@ func get_damage(damage: int):
 	queue_redraw()
 
 
-func _process(delta):
-	velocity.y += body.gravity * delta #ammo logic
+func _process(delta: float) -> void:
+	velocity.y += body.gravity * delta # Ammo logic
 	position += velocity * delta
 	if rot_speed > 0:
 		body.rotation += rot_speed * delta
-	#ammo logic
-	#body.rotation = velocity.angle()
+	# Ammo logic
+	# body.rotation = velocity.angle()
 	queue_redraw()
 
 
-func _on_DeathTimer_timeout():
+func _on_DeathTimer_timeout() -> void:
 	match type:
-		Const.ENEMY_TYPE.BOMB: explosion()
-		_: queue_free()
+		Const.ENEMY_TYPE.BOMB:
+			explosion()
+		_:
+			queue_free()
 
-func explosion():
+
+func explosion() -> void:
 	for area in explosion_area.get_overlapping_areas():
 		make_damage(area)
 
 
-func _draw():
-	var object_pos = to_local(get_global_position())
+func _draw() -> void:
+	var object_pos: Vector2 = to_local(get_global_position())
 	if shield > 0:
 		draw_circle(object_pos, shield_radius, Const.COLOR_ENEMY_SHIELD_INNER) 
 		draw_arc(object_pos, shield_radius, 0, 360, 24, Const.COLOR_ENEMY_SHIELD_OUTER, 5, false)
@@ -134,7 +178,7 @@ func movement_behaviour():
 	pass
 
 
-func _on_enemy_body_area_entered(area): # if enemy touches the ground
+func _on_enemy_body_area_entered(area: Area2D) -> void: # If enemy touches the ground
 	if area.is_in_group(Const.GROUND_GROUP) && city_damage != 0:
 		# Emit enemy reached ground signal
 		EventBus.enemy_reached_ground.emit(self)
@@ -145,12 +189,13 @@ func _on_enemy_body_area_entered(area): # if enemy touches the ground
 		# Use EventBus for health update instead of direct access
 		GlobalVars.change_health(-turret_damage)
 		get_damage(100000)
-	#ammo logic
+	# Ammo logic
 	if area.is_in_group(Const.TURRET_GROUP) || area.is_in_group(Const.GROUND_GROUP):
 		make_damage(area)
 
-#ammo logic
-func make_damage(area):
+
+# Ammo logic
+func make_damage(area: Area2D) -> void:
 	# Validate area node
 	if not area or not is_instance_valid(area):
 		push_warning("Invalid area in make_damage")

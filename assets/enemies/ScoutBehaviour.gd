@@ -2,25 +2,32 @@ extends Node2D
 
 const NodeValidator = preload("res://scripts/NodeValidator.gd")
 
-var ammo = load(Const.PATH_ENEMIES + "Bomb.tscn")
-var border = GlobalVars.project_resolution
-var enemy = null
-@onready var tween = null
-var pos_x = 0.0
-var pos_y = 0.0
-var repeats = 0
+var ammo: PackedScene = load(Const.PATH_ENEMIES + "Bomb.tscn")
+var border: Vector2 = GlobalVars.project_resolution
+var enemy: Node2D = null
+@onready var tween: Tween = null
+var pos_x: float = 0.0
+var pos_y: float = 0.0
+var repeats: int = 0
 
-var muzzle_point = null
-var bullet_speed = 100
-var damage = 1
+var muzzle_point: Node2D = null
+var bullet_speed: float = 100.0
+var damage: int = 1
 
 
-func init(obj):
+func init(obj: Node2D) -> void:
 	enemy = obj
 	tween = enemy.create_tween()
 	pos_x = randf_range(20.0, border.x - 20.0)
 	pos_y = randf_range(20.0, border.y - 200.0)
-	muzzle_point = enemy.get_node("EnemyBody/EndPoint")
+	
+	# Use safe node access instead of hard-coded path
+	muzzle_point = NodeValidator.get_node_safe(enemy, "EnemyBody/EndPoint")
+	if not muzzle_point:
+		push_error("Failed to find EndPoint node in Scout enemy")
+		# Create a fallback position at enemy position
+		muzzle_point = enemy
+	
 	entry()
 
 

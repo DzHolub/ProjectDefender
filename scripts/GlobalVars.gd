@@ -4,33 +4,33 @@ class_name Helper
 const ResourceValidator = preload("res://scripts/ResourceValidator.gd")
 
 var textures: Texture2D
-var additional_debug_info = ''
+var additional_debug_info: String = ''
 
-func _init():
+func _init() -> void:
 	# Load spritesheet with validation
 	textures = ResourceValidator.load_texture(Const.PATH_SPRITESHEET)
 	if textures == null:
 		push_error("Failed to load spritesheet texture")
 		textures = ResourceValidator.get_fallback_texture(Vector2i(512, 512))
 
-var selected_level = 0 #pass here info regarding level to load
+var selected_level: int = 0 # Pass here info regarding level to load
 var score: int = 0
 var health: int = 3
 var citizens: int = 45000
 
 var touch_points: Array[Dictionary] = []
-var max_touches: int = 2 #means max are 2 touches at once
-var current_touches: int = 0 #how many touches are now
+var max_touches: int = 2 # Means max are 2 touches at once
+var current_touches: int = 0 # How many touches are now
 var project_resolution: Vector2 = Vector2(
 	ProjectSettings.get_setting("display/window/size/viewport_width"),
 	ProjectSettings.get_setting("display/window/size/viewport_height")
-	)
+)
 
-#collect all enemyspawner nodes
-@onready var spawner_nodes = get_tree().get_nodes_in_group("Spawner")
+# Collect all enemy spawner nodes
+@onready var spawner_nodes: Array[Node] = get_tree().get_nodes_in_group("Spawner")
 var spawner_queue: int = 0
 	
-func _ready():
+func _ready() -> void:
 	# Initialize touch points for multitouch support
 	for _x in range(max_touches):
 		touch_points.append({
@@ -49,7 +49,7 @@ func _ready():
 	load_progress()
 
 
-func _input(event):
+func _input(event: InputEvent) -> void:
 	# Validate and handle screen drag events
 	if event is InputEventScreenDrag:
 		if validate_touch_index(event.index):
@@ -77,9 +77,9 @@ func _input(event):
 	current_touches = count_active_touches()
 
 
-func _process(_delta): 
+func _process(_delta: float) -> void:
 	# Emit debug info via EventBus instead of direct label access
-	var debug_text = str("Score: ", score, " || Time=", Engine.time_scale, additional_debug_info)
+	var debug_text: String = str("Score: ", score, " || Time=", Engine.time_scale, additional_debug_info)
 	EventBus.emit_debug_info(debug_text)
 	
 	if health <= 0:
@@ -105,13 +105,13 @@ func validate_touch_index(index: int) -> bool:
 
 
 # Validate touch position is within screen bounds
-func validate_touch_position(position: Vector2) -> bool:
-	if position.x < 0 or position.x > project_resolution.x:
-		push_warning("Touch X position out of bounds: " + str(position.x))
+func validate_touch_position(touch_position: Vector2) -> bool:
+	if touch_position.x < 0 or touch_position.x > project_resolution.x:
+		push_warning("Touch X position out of bounds: " + str(touch_position.x))
 		return false
 	
-	if position.y < 0 or position.y > project_resolution.y:
-		push_warning("Touch Y position out of bounds: " + str(position.y))
+	if touch_position.y < 0 or touch_position.y > project_resolution.y:
+		push_warning("Touch Y position out of bounds: " + str(touch_position.y))
 		return false
 	
 	return true
@@ -458,7 +458,7 @@ func handle_corrupted_save():
 	EventBus.load_completed.emit(false, {})
 
 
-func reset_to_defaults():
+func reset_to_defaults() -> void:
 	# Reset game state to default values
 	score = 0
 	health = 3
@@ -472,7 +472,7 @@ func reset_to_defaults():
 	print("Game state reset to defaults")
 
 
-func nulify_progress(): #for debug - delete it later
+func nulify_progress() -> void: # For debug - delete it later
 	score = 0
 	health = 4
 	citizens = 45000
@@ -482,30 +482,34 @@ func nulify_progress(): #for debug - delete it later
 	save_progress()
 
 
-#HELPER FUNCTIONS START
+# HELPER FUNCTIONS START
 
-static func get_bigger_vector2_side(size: Vector2):
+static func get_bigger_vector2_side(size: Vector2) -> float:
 	if size.x > size.y:
 		return size.x
 	else:
 		return size.y
 
-#side vector can be left, right, top, bottom
-static func get_screen_border_margin(margin_percent: float, side: Vector2):
-	var axis_pos
-	if (side == Vector2.RIGHT || side == Vector2.LEFT):
+
+# side vector can be left, right, top, bottom
+static func get_screen_border_margin(margin_percent: float, side: Vector2) -> float:
+	var axis_pos: float
+	if side == Vector2.RIGHT || side == Vector2.LEFT:
 		axis_pos = GlobalVars.project_resolution.x
-	else: 
+	else:
 		axis_pos = GlobalVars.project_resolution.y
-	var calculated_margin = (axis_pos / 100) * margin_percent
+	
+	var calculated_margin: float = (axis_pos / 100.0) * margin_percent
 	match side:
 		Vector2.RIGHT:
 			return axis_pos - calculated_margin
 		Vector2.LEFT:
-			return 0 + calculated_margin
+			return 0.0 + calculated_margin
 		Vector2.UP:
-			return 0 + calculated_margin
+			return 0.0 + calculated_margin
 		Vector2.DOWN:
 			return axis_pos - calculated_margin
+	
+	return 0.0 # Fallback for invalid side
 
-#HELPER FUNCTIONS END
+# HELPER FUNCTIONS END

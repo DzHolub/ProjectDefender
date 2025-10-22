@@ -2,14 +2,12 @@ extends Node
 
 const ResourceValidator = preload("res://scripts/ResourceValidator.gd")
 
-var ammo_instance: Node
-
-var machinegun_ammo: PackedScene
-var laser_ammo: PackedScene
-var artillery_ammo: PackedScene
-var machinegun_hit_particles: PackedScene
-var laser_hit_particles: PackedScene
-var artillery_hit_particles: PackedScene
+var machinegun_ammo: PackedScene = null
+var laser_ammo: PackedScene = null
+var artillery_ammo: PackedScene = null
+var machinegun_hit_particles: PackedScene = null
+var laser_hit_particles: PackedScene = null
+var artillery_hit_particles: PackedScene = null
 
 var resources_loaded: bool = false
 
@@ -66,6 +64,8 @@ func ammo(ammo_name: Const.AMMO) -> Node:
 		load_ammo_resources()
 		if not resources_loaded:
 			return null
+	
+	var ammo_instance: Node = null
 	
 	match(ammo_name):
 		Const.AMMO.MACHINEGUN_BASIC:

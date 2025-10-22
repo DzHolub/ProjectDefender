@@ -2,19 +2,27 @@ extends Node
 
 const ResourceValidator = preload("res://scripts/ResourceValidator.gd")
 
-@export var queue_position: int
-@export var delay_time: float
-@export var random: bool
-@export var enemy_type: Dictionary
-@export var spawn_queue: GDScript
-@onready var spawn_timer = $SpawnTimer
-@onready var delay_timer = $DelayTimer
-var spawn_index = 0
-var left_scr_margin
-var right_scr_margin
+@export var queue_position: int = 0
+@export var delay_time: float = 0.0
+@export var random: bool = false
+@export var enemy_type: Dictionary = {}
+@export var spawn_queue: GDScript = null
+
+@onready var spawn_timer: Timer = $SpawnTimer
+@onready var delay_timer: Timer = $DelayTimer
+
+var spawn_index: int = 0
+var left_scr_margin: float = 0.0
+var right_scr_margin: float = 0.0
 var get_all_enemies: Dictionary = {}
 
-func _ready():
+
+func _ready() -> void:
+	# Validate critical node references
+	if not validate_node_references():
+		push_error("Spawner missing critical node references")
+		return
+	
 	left_scr_margin = Helper.get_screen_border_margin(10, Vector2.LEFT)
 	right_scr_margin = Helper.get_screen_border_margin(10, Vector2.RIGHT)
 	Helper.get_screen_border_margin(15, Vector2.LEFT)
@@ -24,6 +32,21 @@ func _ready():
 	
 	check_queue()
 	init_spawner_index_data()
+
+
+# Validate all required node references exist
+func validate_node_references() -> bool:
+	var all_valid = true
+	
+	if not spawn_timer:
+		push_error("Spawner missing spawn_timer reference")
+		all_valid = false
+	
+	if not delay_timer:
+		push_error("Spawner missing delay_timer reference")
+		all_valid = false
+	
+	return all_valid
 
 
 func load_enemy_scenes() -> void:
@@ -51,22 +74,22 @@ func load_enemy_scenes() -> void:
 	print("Loaded " + str(get_all_enemies.size()) + " enemy types in spawner")
 
 
-func check_queue():
-	for i in GlobalVars.spawner_nodes: #check which spawner must be on right now
+func check_queue() -> void:
+	for i in GlobalVars.spawner_nodes: # Check which spawner must be on right now
 		if i.queue_position == GlobalVars.spawner_queue:
 			if i.delay_timer.is_stopped():
 				i.delay_timer.start(delay_time)
 
 
-func init_spawner_index_data():
+func init_spawner_index_data() -> void:
 	enemy_type.clear()
-	var inner_dict = spawn_queue.QUEUE[spawn_index]
+	var inner_dict: Dictionary = spawn_queue.QUEUE[spawn_index]
 	for q in inner_dict.keys():
 		enemy_type[q] = inner_dict[q]
 
 
-func _on_SpawnTimer_timeout():
-	var randomizer = [] #array to randomize existing ships' spawn
+func _on_SpawnTimer_timeout() -> void:
+	var randomizer: Array = [] # Array to randomize existing ships' spawn
 	for i in enemy_type:
 		if enemy_type[i] > 0:
 			randomizer.append(i)
@@ -112,5 +135,5 @@ func _on_SpawnTimer_timeout():
 			check_queue()
 
 
-func _on_DelayTimer_timeout(): #delay between different spawners - "next wave"
+func _on_DelayTimer_timeout() -> void: # Delay between different spawners - "next wave"
 	spawn_timer.start(1.5)
