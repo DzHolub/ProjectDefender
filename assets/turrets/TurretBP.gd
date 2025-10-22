@@ -1,4 +1,4 @@
-extends Node2D
+extends Area2D
 
 const NodeValidator = preload("res://scripts/NodeValidator.gd")
 
@@ -36,6 +36,13 @@ func _ready() -> void:
 	if not validate_node_references():
 		push_error("Turret missing critical node references")
 		return
+	
+	# Configure collision layers
+	collision_layer = Const.COLLISION_LAYER_TURRET
+	collision_mask = Const.COLLISION_MASK_TURRET
+	
+	# Configure raycast for enemy detection
+	raycast_line.collision_mask = Const.COLLISION_LAYER_ENEMY
 	
 	GlobalTurretData.init_turret(self)
 	reload_timer.set_wait_time(fire_rate)

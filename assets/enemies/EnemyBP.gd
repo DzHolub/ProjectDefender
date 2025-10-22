@@ -36,6 +36,13 @@ func _ready() -> void:
 		push_error("Enemy missing critical node references")
 		return
 	
+	# Configure collision layers
+	body.collision_layer = Const.COLLISION_LAYER_ENEMY
+	body.collision_mask = Const.COLLISION_MASK_ENEMY
+	
+	explosion_area.collision_layer = Const.COLLISION_LAYER_EXPLOSION
+	explosion_area.collision_mask = Const.COLLISION_MASK_EXPLOSION
+	
 	body.gravity = 0.01
 	GlobalEnemyData.init_enemy(self)
 	velocity = Vector2(direction_speed, speed)
@@ -113,7 +120,10 @@ func get_damage(damage: int) -> void:
 		if death_particles and is_instance_valid(death_particles):
 			if body and is_instance_valid(body):
 				death_particles.global_position = body.global_position
-			death_particles.emitting = true
+			
+			# Set emitting if it's a particle system
+			if death_particles is GPUParticles2D or death_particles is CPUParticles2D:
+				death_particles.emitting = true
 			
 			# Use NodeValidator for safe root access
 			var root = NodeValidator.get_root_safe()
@@ -179,18 +189,23 @@ func movement_behaviour():
 
 
 func _on_enemy_body_area_entered(area: Area2D) -> void: # If enemy touches the ground
-	if area.is_in_group(Const.GROUND_GROUP) && city_damage != 0:
+	# Check collision layers instead of groups for better performance
+	var area_layer = area.collision_layer
+	
+	if (area_layer & Const.COLLISION_LAYER_GROUND) != 0 && city_damage != 0:
 		# Emit enemy reached ground signal
 		EventBus.enemy_reached_ground.emit(self)
 		# Use EventBus for citizens update instead of direct access
 		GlobalVars.change_citizens(-city_damage)
 		get_damage(100000)
-	if area.is_in_group(Const.TURRET_GROUP) && turret_damage != 0:
+	
+	if (area_layer & Const.COLLISION_LAYER_TURRET) != 0 && turret_damage != 0:
 		# Use EventBus for health update instead of direct access
 		GlobalVars.change_health(-turret_damage)
 		get_damage(100000)
-	# Ammo logic
-	if area.is_in_group(Const.TURRET_GROUP) || area.is_in_group(Const.GROUND_GROUP):
+	
+	# Ammo logic - check for turret or ground collision
+	if (area_layer & (Const.COLLISION_LAYER_TURRET | Const.COLLISION_LAYER_GROUND)) != 0:
 		make_damage(area)
 
 
@@ -210,7 +225,11 @@ func make_damage(area: Area2D) -> void:
 		var emitted_particles = hit_particles.instantiate()
 		if emitted_particles and is_instance_valid(emitted_particles):
 			emitted_particles.global_position = global_position
-			emitted_particles.emitting = true
+			
+			# Set emitting if it's a particle system
+			if emitted_particles is GPUParticles2D or emitted_particles is CPUParticles2D:
+				emitted_particles.emitting = true
+			
 			emitted_particles.rotation_degrees = rotation_degrees
 			
 			# Use NodeValidator for safe root access

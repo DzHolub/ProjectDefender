@@ -67,6 +67,7 @@ func ammo(ammo_name: Const.AMMO) -> Node:
 	
 	var ammo_instance: Node = null
 	
+	# Instantiate ammo based on type
 	match(ammo_name):
 		Const.AMMO.MACHINEGUN_BASIC:
 			ammo_instance = safe_instantiate_ammo(machinegun_ammo, "Machinegun")
@@ -74,7 +75,8 @@ func ammo(ammo_name: Const.AMMO) -> Node:
 				ammo_instance.type = Const.AMMO_TYPE.BULLET
 				ammo_instance.speed = 5000
 				ammo_instance.damage = 50
-				ammo_instance.hit_particles = safe_instantiate_particles(machinegun_hit_particles)
+				ammo_instance.ammo_gravity = 0.0
+				ammo_instance.hit_particles = machinegun_hit_particles
 				
 		Const.AMMO.LASER_BASIC:
 			ammo_instance = safe_instantiate_ammo(laser_ammo, "Laser")
@@ -82,7 +84,8 @@ func ammo(ammo_name: Const.AMMO) -> Node:
 				ammo_instance.type = Const.AMMO_TYPE.LASER
 				ammo_instance.speed = 5000
 				ammo_instance.damage = 800
-				ammo_instance.hit_particles = safe_instantiate_particles(laser_hit_particles)
+				ammo_instance.ammo_gravity = 0.0
+				ammo_instance.hit_particles = laser_hit_particles
 				
 		Const.AMMO.ARTILLERY_BASIC:
 			ammo_instance = safe_instantiate_ammo(artillery_ammo, "Artillery")
@@ -90,7 +93,8 @@ func ammo(ammo_name: Const.AMMO) -> Node:
 				ammo_instance.type = Const.AMMO_TYPE.EXPLOSIVE
 				ammo_instance.speed = 500
 				ammo_instance.damage = 1800
-				ammo_instance.hit_particles = safe_instantiate_particles(artillery_hit_particles)
+				ammo_instance.ammo_gravity = 50.0
+				ammo_instance.hit_particles = artillery_hit_particles
 	
 	return ammo_instance
 
@@ -105,13 +109,4 @@ func safe_instantiate_ammo(scene: PackedScene, ammo_name: String) -> Node:
 		push_error("Failed to instantiate ammo: " + ammo_name)
 		return null
 	
-	return instance
-
-
-func safe_instantiate_particles(scene: PackedScene) -> Node:
-	if scene == null:
-		push_warning("Particle scene is null, skipping")
-		return null
-	
-	var instance = scene.instantiate()
 	return instance

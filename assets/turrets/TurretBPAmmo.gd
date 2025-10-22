@@ -1,7 +1,7 @@
 extends Area2D
 
 var type: Const.AMMO_TYPE
-var hit_particles: Node = null
+var hit_particles: PackedScene = null
 var health: int = 0
 var speed: float = 0.0
 var velocity: Vector2 = Vector2.ZERO
@@ -24,6 +24,14 @@ func _ready() -> void:
 		push_error("Ammo missing critical node references")
 		queue_free()
 		return
+	
+	# Configure collision layers
+	collision_layer = Const.COLLISION_LAYER_BULLET
+	collision_mask = Const.COLLISION_MASK_BULLET
+	
+	# Configure explosion area
+	explosion_area.collision_layer = Const.COLLISION_LAYER_EXPLOSION
+	explosion_area.collision_mask = Const.COLLISION_MASK_EXPLOSION
 	
 	velocity = Vector2(speed,0).rotated(rot)
 	start_position = get_global_position()
@@ -76,7 +84,8 @@ func _on_DestructionTimer_timeout() -> void:
 
 
 func _on_Bullet_area_entered(area: Area2D) -> void:
-	if area.is_in_group("enemy"):
+	# Check collision layer instead of group for better performance
+	if (area.collision_layer & Const.COLLISION_LAYER_ENEMY) != 0:
 		if detonation_area_multiplier > 0.0:
 			init_explosion()
 		else:
@@ -101,12 +110,17 @@ func init_damage(area: Area2D) -> void:
 
 
 func emit_hit_particles() -> void:
-	if hit_particles and is_instance_valid(hit_particles):
-		hit_particles.global_position = global_position
-		hit_particles.emitting = true
-		hit_particles.rotation_degrees = rotation_degrees
-	else:
-		push_warning("Hit particles are null or invalid")
+	if hit_particles:
+		var emitted_particles = hit_particles.instantiate()
+		if emitted_particles and is_instance_valid(emitted_particles):
+			emitted_particles.global_position = global_position
+			
+			# Set emitting if it's a particle system
+			if emitted_particles is GPUParticles2D or emitted_particles is CPUParticles2D:
+				emitted_particles.emitting = true
+			
+			emitted_particles.rotation_degrees = rotation_degrees
+			get_node("/root/").add_child(emitted_particles)
 
 
 func destroy_behaviour() -> void:
