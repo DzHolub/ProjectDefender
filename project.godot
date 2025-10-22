@@ -17,6 +17,7 @@ boot_splash/show_image=false
 
 [autoload]
 
+EventBus="*res://scripts/EventBus.gd"
 Const="*res://scripts/Const.gd"
 GlobalVars="*res://scripts/GlobalVars.gd"
 GlobalTurretData="*res://scripts/GlobalTurretData.gd"

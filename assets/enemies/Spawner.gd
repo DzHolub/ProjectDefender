@@ -50,6 +50,10 @@ func _on_SpawnTimer_timeout():
 			spawn_timer.set_wait_time(randf_range(0.4, 3))
 			e.global_position.x = randf_range(left_scr_margin, right_scr_margin)
 		add_child(e)
+		
+		# Emit enemy spawned signal
+		EventBus.enemy_spawned.emit(e)
+		
 		enemy_type[rand_enemy] -= 1 #decrease one spawned ship from the pool
 	else:
 		if spawn_index < (spawn_queue.QUEUE.size() - 1):

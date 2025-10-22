@@ -1,12 +1,13 @@
 extends Control
 
-var current_score
-var current_citizens
-var critical_number_citizens
+var current_score: int
+var current_citizens: int
+var critical_number_citizens: int
 var tween_node = null
 @onready var low_lives_timer = $LowLivesTimer
 @onready var citizens_info = $CitizensInfo
 @onready var citizens_count = $CitizensInfo/CitizensCount
+@onready var debug_label = $DebugLabel
 
 
 func _ready():
@@ -14,14 +15,36 @@ func _ready():
 	current_score = GlobalVars.score
 	citizens_count.text = format_number_with_k(current_citizens)
 	critical_number_citizens = int((GlobalVars.citizens / 100.0) * 20.0)
+	
+	# Connect to EventBus signals instead of polling
+	EventBus.score_changed.connect(_on_score_changed)
+	EventBus.citizens_changed.connect(_on_citizens_changed)
+	EventBus.debug_info_changed.connect(_on_debug_info_changed)
+	EventBus.game_over.connect(_on_game_over)
 
 
-func _process(_delta):
-	if current_citizens != GlobalVars.citizens or current_citizens <= critical_number_citizens or current_score != GlobalVars.score:
-		current_citizens = GlobalVars.citizens
-		current_score = GlobalVars.score
-		citizens_count.text = format_number_with_k(current_citizens)
+func _on_score_changed(new_score: int):
+	current_score = new_score
+	# Update any score-related UI elements here if needed
+
+
+func _on_citizens_changed(new_citizens: int):
+	current_citizens = new_citizens
+	citizens_count.text = format_number_with_k(current_citizens)
+	
+	# Check if citizens are critically low
+	if current_citizens <= critical_number_citizens:
 		on_citizens_changed()
+
+
+func _on_debug_info_changed(info: String):
+	if debug_label:
+		debug_label.text = info
+
+
+func _on_game_over(final_score: int, reason: String):
+	print("Game Over! Score: ", final_score, " Reason: ", reason)
+	# Handle game over UI here
 
 
 func _on_Button_pressed(): #FOR DEBUG - DELETE IT LATER

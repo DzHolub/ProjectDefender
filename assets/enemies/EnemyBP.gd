@@ -46,22 +46,34 @@ func _ready():
 			bomb_flicker_timer.start(0.4)
 
 
-func get_damage(damage):
+func get_damage(damage: int):
+	# Emit enemy hit signal
+	EventBus.enemy_hit.emit(self, damage)
+	
 	if shield > 0:
 		shield -= damage
 		if shield <= 0:
 			health += shield
 			shield = 0
-			shield_collizion_zone.get_shape().radius =  0
+			shield_collizion_zone.get_shape().radius = 0
+			# Emit shield broken signal
+			EventBus.enemy_shield_broken.emit(self)
 	elif shield <= 0:
 		health -= damage
+		
 	if health <= 0:
+		# Emit enemy destruction signal
+		EventBus.enemy_destroyed.emit(self, type)
+		
 		death_particles.global_position = body.global_position
 		death_particles.emitting = true
 		get_node('/root').add_child(death_particles)
-		GlobalVars.score += 1
-		GlobalVars.save_progress() #FOR DEBUG - DELETE IT FROM HERE
+		
+		# Use EventBus for score update instead of direct access
+		GlobalVars.add_score(1)
+		
 		queue_free()
+		
 	text_label.text = str(health) + "/" + str(shield) + "/" + str(shield_collizion_zone.get_shape().radius)
 	queue_redraw()
 
@@ -107,10 +119,14 @@ func movement_behaviour():
 
 func _on_enemy_body_area_entered(area): # if enemy touches the ground
 	if area.is_in_group(Const.GROUND_GROUP) && city_damage != 0:
-		GlobalVars.citizens -= city_damage
+		# Emit enemy reached ground signal
+		EventBus.enemy_reached_ground.emit(self)
+		# Use EventBus for citizens update instead of direct access
+		GlobalVars.change_citizens(-city_damage)
 		get_damage(100000)
 	if area.is_in_group(Const.TURRET_GROUP) && turret_damage != 0:
-		GlobalVars.health -= turret_damage
+		# Use EventBus for health update instead of direct access
+		GlobalVars.change_health(-turret_damage)
 		get_damage(100000)
 	#ammo logic
 	if area.is_in_group(Const.TURRET_GROUP) || area.is_in_group(Const.GROUND_GROUP):
