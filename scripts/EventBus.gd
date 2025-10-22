@@ -10,55 +10,89 @@ signal citizens_changed(new_citizens: int)
 signal game_state_changed(new_state: GameState)
 
 # Turret Signals
+@warning_ignore("unused_signal")
 signal turret_activated(turret: Node2D)
+@warning_ignore("unused_signal")
 signal turret_deactivated(turret: Node2D)
+@warning_ignore("unused_signal")
 signal turret_fired(turret: Node2D, ammo_type: Const.AMMO)
+@warning_ignore("unused_signal")
 signal turret_reloaded(turret: Node2D)
+@warning_ignore("unused_signal")
 signal turret_ammo_changed(turret: Node2D, new_amount: int)
 
 # Enemy Signals
+@warning_ignore("unused_signal")
 signal enemy_spawned(enemy: Node2D)
+@warning_ignore("unused_signal")
 signal enemy_destroyed(enemy: Node2D, enemy_type: Const.ENEMY_TYPE)
+@warning_ignore("unused_signal")
 signal enemy_reached_ground(enemy: Node2D)
+@warning_ignore("unused_signal")
 signal enemy_hit(enemy: Node2D, damage: int)
+@warning_ignore("unused_signal")
 signal enemy_shield_broken(enemy: Node2D)
 
 # Combat Signals
+@warning_ignore("unused_signal")
 signal bullet_fired(bullet: Node2D, from_turret: Node2D)
+@warning_ignore("unused_signal")
 signal bullet_hit(bullet: Node2D, target: Node2D)
+@warning_ignore("unused_signal")
 signal explosion_triggered(position: Vector2, damage: int, radius: float)
 
 # UI Signals
+@warning_ignore("unused_signal")
 signal ui_update_requested(element: String, data: Variant)
+@warning_ignore("unused_signal")
 signal debug_info_changed(info: String)
+@warning_ignore("unused_signal")
 signal screen_shake_requested(intensity: float, duration: float)
 
 # Input Signals
+@warning_ignore("unused_signal")
 signal touch_started(touch_index: int, position: Vector2)
+@warning_ignore("unused_signal")
 signal touch_ended(touch_index: int, position: Vector2)
+@warning_ignore("unused_signal")
 signal touch_moved(touch_index: int, position: Vector2)
 
 # Spawner Signals
+@warning_ignore("unused_signal")
 signal spawner_activated(spawner: Node)
+@warning_ignore("unused_signal")
 signal spawner_deactivated(spawner: Node)
+@warning_ignore("unused_signal")
 signal wave_started(wave_number: int)
+@warning_ignore("unused_signal")
 signal wave_completed(wave_number: int)
 
 # Save/Load Signals
+@warning_ignore("unused_signal")
 signal save_requested()
+@warning_ignore("unused_signal")
 signal save_completed(success: bool)
+@warning_ignore("unused_signal")
 signal load_requested()
+@warning_ignore("unused_signal")
 signal load_completed(success: bool, data: Dictionary)
 
 # Performance Signals
+@warning_ignore("unused_signal")
 signal object_pool_requested(object_type: String, count: int)
+@warning_ignore("unused_signal")
 signal object_returned_to_pool(object: Node, pool_type: String)
 
 # Game Flow Signals
+@warning_ignore("unused_signal")
 signal level_started(level_id: int)
+@warning_ignore("unused_signal")
 signal level_completed(level_id: int, score: int)
+@warning_ignore("unused_signal")
 signal game_over(final_score: int, reason: String)
+@warning_ignore("unused_signal")
 signal pause_requested()
+@warning_ignore("unused_signal")
 signal resume_requested()
 
 ## Game State Enum

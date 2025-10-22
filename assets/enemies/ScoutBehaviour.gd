@@ -1,5 +1,7 @@
 extends Node2D
 
+const NodeValidator = preload("res://scripts/NodeValidator.gd")
+
 var ammo = load(Const.PATH_ENEMIES + "Bomb.tscn")
 var border = GlobalVars.project_resolution
 var enemy = null
@@ -59,7 +61,24 @@ func change_position():
 
 
 func shoot():
+	if not ammo:
+		push_warning("Ammo scene is null in scout behaviour")
+		return
+	
 	var bullet = ammo.instantiate()
+	if not bullet or not is_instance_valid(bullet):
+		push_error("Failed to instantiate bullet in scout behaviour")
+		return
+	
 	bullet.type = Const.ENEMY_TYPE.BOMB
-	bullet.global_position = muzzle_point.global_position
-	enemy.get_node("/root").add_child(bullet)
+	
+	if muzzle_point and is_instance_valid(muzzle_point):
+		bullet.global_position = muzzle_point.global_position
+	
+	# Use NodeValidator for safe root access
+	var root = NodeValidator.get_root_safe()
+	if root:
+		root.add_child(bullet)
+	else:
+		if bullet:
+			bullet.queue_free()

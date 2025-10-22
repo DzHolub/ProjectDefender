@@ -1,5 +1,7 @@
 extends Node2D
 
+const NodeValidator = preload("res://scripts/NodeValidator.gd")
+
 @export var type: Const.ENEMY_TYPE
 var start_position
 var speed = 10
@@ -55,7 +57,8 @@ func get_damage(damage: int):
 		if shield <= 0:
 			health += shield
 			shield = 0
-			shield_collizion_zone.get_shape().radius = 0
+			if shield_collizion_zone and shield_collizion_zone.get_shape():
+				shield_collizion_zone.get_shape().radius = 0
 			# Emit shield broken signal
 			EventBus.enemy_shield_broken.emit(self)
 	elif shield <= 0:
@@ -65,16 +68,30 @@ func get_damage(damage: int):
 		# Emit enemy destruction signal
 		EventBus.enemy_destroyed.emit(self, type)
 		
-		death_particles.global_position = body.global_position
-		death_particles.emitting = true
-		get_node('/root').add_child(death_particles)
+		# Safely add death particles
+		if death_particles and is_instance_valid(death_particles):
+			if body and is_instance_valid(body):
+				death_particles.global_position = body.global_position
+			death_particles.emitting = true
+			
+			# Use NodeValidator for safe root access
+			var root = NodeValidator.get_root_safe()
+			if root:
+				root.add_child(death_particles)
 		
 		# Use EventBus for score update instead of direct access
 		GlobalVars.add_score(1)
 		
 		queue_free()
+		return
 		
-	text_label.text = str(health) + "/" + str(shield) + "/" + str(shield_collizion_zone.get_shape().radius)
+	# Update label with null checks
+	if text_label and is_instance_valid(text_label):
+		var radius_str = "0"
+		if shield_collizion_zone and shield_collizion_zone.get_shape():
+			radius_str = str(shield_collizion_zone.get_shape().radius)
+		text_label.text = str(health) + "/" + str(shield) + "/" + radius_str
+	
 	queue_redraw()
 
 
@@ -134,14 +151,28 @@ func _on_enemy_body_area_entered(area): # if enemy touches the ground
 
 #ammo logic
 func make_damage(area):
+	# Validate area node
+	if not area or not is_instance_valid(area):
+		push_warning("Invalid area in make_damage")
+		return
+	
 	if area.has_method("get_damage"):
 		area.get_damage(turret_damage)
 		area.get_damage(city_damage)
-	var emitted_particles = hit_particles.instantiate()
-	emitted_particles.global_position = global_position
-	emitted_particles.emitting = true
-	emitted_particles.rotation_degrees = rotation_degrees
-	get_node("/root/").add_child(emitted_particles)
+	
+	# Safely instantiate and add particles
+	if hit_particles:
+		var emitted_particles = hit_particles.instantiate()
+		if emitted_particles and is_instance_valid(emitted_particles):
+			emitted_particles.global_position = global_position
+			emitted_particles.emitting = true
+			emitted_particles.rotation_degrees = rotation_degrees
+			
+			# Use NodeValidator for safe root access
+			var root = NodeValidator.get_root_safe()
+			if root:
+				root.add_child(emitted_particles)
+	
 	match type:
 		Const.ENEMY_TYPE.TRAINING: pass
 		_: queue_free()

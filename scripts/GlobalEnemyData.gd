@@ -1,5 +1,7 @@
 extends Node
 
+const ResourceValidator = preload("res://scripts/ResourceValidator.gd")
+
 # Cache particle scenes to avoid repeated loading
 var asteroid_particles: PackedScene
 var scout_behaviour_script: Script

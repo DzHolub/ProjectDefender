@@ -1,5 +1,7 @@
 extends Node
 
+const ResourceValidator = preload("res://scripts/ResourceValidator.gd")
+
 @export var queue_position: int
 @export var delay_time: float
 @export var random: bool

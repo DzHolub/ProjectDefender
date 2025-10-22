@@ -53,10 +53,14 @@ func _physics_process(_delta):
 
 
 func turret_movement(): #allows to move turret if it's activated
-	for id in GlobalVars.touch_points:
-		if str(id.assigned_id) == str(self):
-			rotation = lerp_angle(rotation, (id.pos - global_position).normalized().angle(), rotation_speed)
-			turret_ui(id)
+	# Safely iterate through touch points with validation
+	for i in range(GlobalVars.touch_points.size()):
+		if i >= 0 and i < GlobalVars.touch_points.size():
+			var touch_point = GlobalVars.get_touch_point(i)
+			if touch_point.has("assigned_id") and str(touch_point.assigned_id) == str(self):
+				if touch_point.has("pos") and touch_point.pos is Vector2:
+					rotation = lerp_angle(rotation, (touch_point.pos - global_position).normalized().angle(), rotation_speed)
+					turret_ui(touch_point)
 
 	#temporary functionality for mouse
 	if OS.get_name() != "Android": 
@@ -131,15 +135,25 @@ func _draw():
 
 
 func _input(event):
-	#calculate if finger is within radius check touches and drags for the exact turret. Activates it
+	# Calculate if finger is within radius, check touches and drags for the exact turret. Activates it
 	var touch_distance = self.get_position().distance_to(event.get_position())
-	if (event is InputEventScreenTouch):
-		if touch_distance <= Const.UI_TURRET_ACTIVATION_ZONE:
-			finger_id = event.get_index()
+	if event is InputEventScreenTouch:
+		var touch_index = event.get_index()
+		
+		# Validate touch index before accessing touch_points array
+		if not GlobalVars.validate_touch_index(touch_index):
+			push_warning("Invalid touch index in turret input: " + str(touch_index))
+			return
+		
+		# Handle touch press
+		if event.is_pressed() and touch_distance <= Const.UI_TURRET_ACTIVATION_ZONE:
+			finger_id = touch_index
 			GlobalVars.touch_points[finger_id].assigned_id = self
 			is_activated = true
-		if !event.is_pressed() && event.get_index() == finger_id:
-			if is_chargeable && is_charged && touch_distance > Const.UI_TURRET_ACTIVATION_ZONE:
+		
+		# Handle touch release
+		if not event.is_pressed() and touch_index == finger_id:
+			if is_chargeable and is_charged and touch_distance > Const.UI_TURRET_ACTIVATION_ZONE:
 				is_shooting = true
 				turret_fire()
 			turret_disable()

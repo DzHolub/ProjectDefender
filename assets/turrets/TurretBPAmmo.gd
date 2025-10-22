@@ -76,9 +76,12 @@ func init_damage(area):
 
 
 func emit_hit_particles():
-	hit_particles.global_position = global_position
-	hit_particles.emitting = true
-	hit_particles.rotation_degrees = rotation_degrees
+	if hit_particles and is_instance_valid(hit_particles):
+		hit_particles.global_position = global_position
+		hit_particles.emitting = true
+		hit_particles.rotation_degrees = rotation_degrees
+	else:
+		push_warning("Hit particles are null or invalid")
 
 
 func destroy_behaviour():

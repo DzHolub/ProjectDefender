@@ -1,6 +1,8 @@
 extends Node2D
 class_name Helper
 
+const ResourceValidator = preload("res://scripts/ResourceValidator.gd")
+
 var textures: Texture2D
 var additional_debug_info = ''
 
@@ -29,25 +31,50 @@ var project_resolution: Vector2 = Vector2(
 var spawner_queue: int = 0
 	
 func _ready():
-	#save data for positions in multitouch
+	# Initialize touch points for multitouch support
 	for _x in range(max_touches):
-		touch_points.append({pos=Vector2(), start_pos=Vector2(), 
-		state = false, assigned_id = 0})
+		touch_points.append({
+			pos = Vector2(),
+			start_pos = Vector2(),
+			state = false,
+			assigned_id = 0
+		})
+	
+	# Validate touch points were initialized correctly
+	if validate_all_touch_points():
+		print("Touch points validated successfully")
+	else:
+		push_error("Touch points validation failed - input may be unreliable")
+	
 	load_progress()
 
 
 func _input(event):
+	# Validate and handle screen drag events
 	if event is InputEventScreenDrag:
-		touch_points[event.index].pos  = event.position
+		if validate_touch_index(event.index):
+			if validate_touch_position(event.position):
+				touch_points[event.index].pos = event.position
+			else:
+				push_warning("Invalid touch position in drag event: " + str(event.position))
+		else:
+			push_warning("Invalid touch index in drag event: " + str(event.index))
+	
+	# Validate and handle screen touch events
 	if event is InputEventScreenTouch:
-		touch_points[event.index].state = event.pressed
-		touch_points[event.index].pos  = event.position
-		if event.pressed:
-			touch_points[event.index].start_pos = event.position
-	current_touches = 0
-	for point in touch_points:
-		if point.state:
-			current_touches += 1
+		if validate_touch_index(event.index):
+			if validate_touch_position(event.position):
+				touch_points[event.index].state = event.pressed
+				touch_points[event.index].pos = event.position
+				if event.pressed:
+					touch_points[event.index].start_pos = event.position
+			else:
+				push_warning("Invalid touch position in touch event: " + str(event.position))
+		else:
+			push_warning("Invalid touch index in touch event: " + str(event.index))
+	
+	# Safely count active touches
+	current_touches = count_active_touches()
 
 
 func _process(_delta): 
@@ -58,10 +85,141 @@ func _process(_delta):
 	if health <= 0:
 		EventBus.game_over.emit(score, "Health depleted")
 
+## Input Validation Functions
+
+# Validate touch index is within bounds
+func validate_touch_index(index: int) -> bool:
+	if index < 0:
+		push_error("Touch index is negative: " + str(index))
+		return false
+	
+	if index >= max_touches:
+		push_error("Touch index exceeds max_touches: " + str(index) + " >= " + str(max_touches))
+		return false
+	
+	if index >= touch_points.size():
+		push_error("Touch index exceeds touch_points array size: " + str(index) + " >= " + str(touch_points.size()))
+		return false
+	
+	return true
+
+
+# Validate touch position is within screen bounds
+func validate_touch_position(position: Vector2) -> bool:
+	if position.x < 0 or position.x > project_resolution.x:
+		push_warning("Touch X position out of bounds: " + str(position.x))
+		return false
+	
+	if position.y < 0 or position.y > project_resolution.y:
+		push_warning("Touch Y position out of bounds: " + str(position.y))
+		return false
+	
+	return true
+
+
+# Validate touch point data structure
+func validate_touch_point(touch_point: Dictionary) -> bool:
+	if not touch_point.has("pos"):
+		push_error("Touch point missing 'pos' field")
+		return false
+	
+	if not touch_point.has("start_pos"):
+		push_error("Touch point missing 'start_pos' field")
+		return false
+	
+	if not touch_point.has("state"):
+		push_error("Touch point missing 'state' field")
+		return false
+	
+	if not touch_point.has("assigned_id"):
+		push_error("Touch point missing 'assigned_id' field")
+		return false
+	
+	if not touch_point["pos"] is Vector2:
+		push_error("Touch point 'pos' is not a Vector2")
+		return false
+	
+	if not touch_point["start_pos"] is Vector2:
+		push_error("Touch point 'start_pos' is not a Vector2")
+		return false
+	
+	if not touch_point["state"] is bool:
+		push_error("Touch point 'state' is not a bool")
+		return false
+	
+	return true
+
+
+# Safely get touch point with validation
+func get_touch_point(index: int) -> Dictionary:
+	if not validate_touch_index(index):
+		# Return a safe default touch point
+		return {
+			pos = Vector2(),
+			start_pos = Vector2(),
+			state = false,
+			assigned_id = 0
+		}
+	
+	var touch_point = touch_points[index]
+	if not validate_touch_point(touch_point):
+		push_error("Invalid touch point data at index: " + str(index))
+		# Return a safe default touch point
+		return {
+			pos = Vector2(),
+			start_pos = Vector2(),
+			state = false,
+			assigned_id = 0
+		}
+	
+	return touch_point
+
+
+# Safely count active touches
+func count_active_touches() -> int:
+	var count = 0
+	for i in range(touch_points.size()):
+		if i < touch_points.size():  # Bounds check
+			var point = touch_points[i]
+			if point.has("state") and point["state"]:
+				count += 1
+	return count
+
+
+# Reset touch point to default state
+func reset_touch_point(index: int) -> void:
+	if validate_touch_index(index):
+		touch_points[index] = {
+			pos = Vector2(),
+			start_pos = Vector2(),
+			state = false,
+			assigned_id = 0
+		}
+
+
+# Validate all touch points on initialization
+func validate_all_touch_points() -> bool:
+	if touch_points.size() != max_touches:
+		push_error("Touch points array size mismatch. Expected: " + str(max_touches) + ", Got: " + str(touch_points.size()))
+		return false
+	
+	var all_valid = true
+	for i in range(touch_points.size()):
+		if not validate_touch_point(touch_points[i]):
+			push_error("Invalid touch point at index: " + str(i))
+			all_valid = false
+	
+	return all_valid
+
+
 ## Game State Management Functions
 
 # Update score and emit signal
 func add_score(amount: int) -> void:
+	if amount < 0:
+		push_warning("Attempted to add negative score: " + str(amount))
+		return
+	
 	if amount > 0:
 		score += amount
 		EventBus.emit_score_changed(score)

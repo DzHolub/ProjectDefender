@@ -1,5 +1,7 @@
 extends Node
 
+const ResourceValidator = preload("res://scripts/ResourceValidator.gd")
+
 var ammo_instance: Node
 
 var machinegun_ammo: PackedScene
